@@ -55,16 +55,19 @@ const out = await page.evaluate(async ({ base, flats, params, S }) => {
       const u = (th - p.ta) / (p.tb - p.ta), v = (Y - t) / (b - t);
       const s = sample(clamp(u, 0, 1), clamp(v, 0, 1));
       if (s[3] <= 0) continue;
-      const L = Math.min(1.02, light(X) / p.lum_max);
+      const cosT = Math.cos(th);
+      const L = Math.min(0.97, light(X) / p.lum_max) * (0.74 + 0.26 * Math.pow(Math.max(0, cosT), 0.8));
+      const grain = (Math.random() - 0.5) * 9;
       const k = (py * W + px) * 4, a = s[3] * cov;
-      for (let c = 0; c < 3; c++) o[k + c] = clamp(s[c] / s[3] * L * p.tint[c], 0, 255);
+      for (let c = 0; c < 3; c++) o[k + c] = clamp((s[c] / s[3] * 0.94 + 8) * L * p.tint[c] + grain, 0, 255);
       o[k + 3] = a * 255;
     }
   }
   lc.putImageData(outData, 0, 0);
-  mc.filter = 'blur(0.7px)'; mc.drawImage(layer, 0, 0); mc.filter = 'none';
-  const CROP_X = 40 * S; // drop the half-visible bottle on the far left
-  const outC = new OffscreenCanvas(W - CROP_X, H); outC.getContext('2d').drawImage(main, -CROP_X, 0);
+  mc.filter = 'blur(1.3px)'; mc.drawImage(layer, 0, 0); mc.filter = 'none';
+  // clean two-bottle crop (pomegranate + grape); drops the cut-off bottles at both edges
+  const CX0 = 30 * S, CX1 = 337 * S, CY0 = 8 * S, CY1 = 622 * S;
+  const outC = new OffscreenCanvas(CX1 - CX0, CY1 - CY0); outC.getContext('2d').drawImage(main, -CX0, -CY0);
   const blob = await outC.convertToBlob({ type: 'image/png' });
   const buf = new Uint8Array(await blob.arrayBuffer()); let s = '';
   for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode(...buf.subarray(i, i + 0x8000));

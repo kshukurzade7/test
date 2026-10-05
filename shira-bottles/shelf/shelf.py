@@ -34,8 +34,8 @@ LABELS = {
 }
 # neck collars: cx, R, top and bottom y of the band (just under the cap)
 COLLARS = {
-    "A": dict(flavour="pomegranate", cx=107, R=25, top=71.5, bot=84),
-    "B": dict(flavour="grape", cx=269, R=27, top=73.5, bot=86),
+    "A": dict(flavour="pomegranate", cx=107, R=25, top=70.5, bot=88),
+    "B": dict(flavour="grape", cx=269, R=27, top=72.5, bot=90),
 }
 
 
@@ -113,11 +113,11 @@ def main():
         span = range(int(x0 * 4) - 4, int(x1 * 4) + 5)
         # front of the ring sits slightly lower than its sides (seen from below eye level)
         curve = lambda x, y: y + 1.2 * (1 - ((x - cx) / R) ** 2)
-        lum = [235 * (0.72 + 0.28 * math.cos(math.asin(max(-1, min(1, (x - cx) / R))))) for x in range(int(x0), int(x1) + 1)]
+        lum = [222 * (0.62 + 0.38 * math.cos(math.asin(max(-1, min(1, (x - cx) / R))))) for x in range(int(x0), int(x1) + 1)]
         params.append(dict(
             svg=f"flat/{lid}-collar.svg", cx=cx, R=R, ta=ta, tb=tb, x0=x0, x1=x1,
             top=[curve(x / 4, C["top"]) for x in span], bot=[curve(x / 4, C["bot"]) for x in span], qx0=span.start,
-            lum_x0=int(x0), lum=lum, lum_max=235, tint=[0.97, 0.99, 1.04]))
+            lum_x0=int(x0), lum=lum, lum_max=240, tint=[0.97, 0.99, 1.04]))
     (HERE / "params.json").write_text(json.dumps(params), encoding="utf-8")
 
 
