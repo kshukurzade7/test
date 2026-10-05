@@ -38,6 +38,7 @@ LABELS = {
 FONT_DIR = HERE.parent / "fonts"
 LATIN = "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212"
 LATIN_EXT = "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF"
+CYRILLIC = "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116"
 
 
 def embedded_fonts():
@@ -48,7 +49,10 @@ def embedded_fonts():
         ("Cormorant Garamond", "cormorant-garamond-latin-ext-500-normal", "normal", LATIN_EXT),
         ("Cormorant Garamond", "cormorant-garamond-latin-500-italic", "italic", LATIN),
         ("Cormorant Garamond", "cormorant-garamond-latin-ext-500-italic", "italic", LATIN_EXT),
+        ("Cormorant Garamond", "cormorant-garamond-cyrillic-500-normal", "normal", CYRILLIC),
+        ("Cormorant Garamond", "cormorant-garamond-cyrillic-500-italic", "italic", CYRILLIC),
         ("Montserrat", "montserrat-latin-500-normal", "normal", LATIN),
+        ("Montserrat", "montserrat-cyrillic-500-normal", "normal", CYRILLIC),
     ]:
         data = base64.b64encode((FONT_DIR / f"{file}.woff2").read_bytes()).decode()
         faces.append(f"@font-face{{font-family:'{fam}';font-style:{style};font-weight:500;"
@@ -127,9 +131,12 @@ def flat_label(f, fw, fh):
   <text x="{cx}" y="{fh*0.3:.2f}" text-anchor="middle" font-family="{SERIF}" font-size="11.5" letter-spacing="2.2" fill="{INK}">SHIRÁ</text>
   <line x1="{cx-6}" y1="{fh*0.335:.2f}" x2="{cx+6}" y2="{fh*0.335:.2f}" stroke="#C9A35A" stroke-width="0.35"/>
   <text x="{cx}" y="{fh*0.44:.2f}" text-anchor="middle" font-family="{SERIF}" font-style="italic" font-size="{8 if len(f['name']) < 9 else 7}" fill="{f['accent']}">{f['name']}</text>
-  <text x="{cx}" y="{fh*0.505:.2f}" text-anchor="middle" font-family="{SANS}" font-size="2.5" letter-spacing="0.7" fill="#6b5a4e">100% NATURAL JUICE</text>
-  <g transform="translate({fw*0.12:.2f} {fh - 6.2:.2f})">{az_flag(5.2)}</g>
-  <text x="{fw*0.12 + 6.8:.2f}" y="{fh - 3.6:.2f}" font-family="{SANS}" font-size="2.2" letter-spacing="0.5" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>
+  <text x="{cx}" y="{fh*0.49:.2f}" text-anchor="middle" font-family="{SANS}" font-size="2.3" letter-spacing="0.6" fill="#6b5a4e">100% NATURAL JUICE</text>
+  <text x="{cx}" y="{fh*0.525:.2f}" text-anchor="middle" font-family="{SANS}" font-size="2.3" letter-spacing="0.4" fill="#6b5a4e">100% НАТУРАЛЬНЫЙ СОК</text>
+  <text x="{fw*0.12:.2f}" y="{band_y + bh*0.27:.2f}" font-family="{SERIF}" font-style="italic" font-size="5.5" fill="{CREAM}">{f.get('ru_name', '')}</text>
+  <g transform="translate({fw*0.12:.2f} {fh - 7.4:.2f})">{az_flag(5.2)}</g>
+  <text x="{fw*0.12 + 6.8:.2f}" y="{fh - 5.6:.2f}" font-family="{SANS}" font-size="2.0" letter-spacing="0.4" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>
+  <text x="{fw*0.12 + 6.8:.2f}" y="{fh - 3.0:.2f}" font-family="{SANS}" font-size="2.0" letter-spacing="0.05" fill="{CREAM}">ПРОИЗВЕДЕНО В АЗЕРБАЙДЖАНЕ</text>
   <text x="{fw*0.88:.2f}" y="{fh - 3.6:.2f}" text-anchor="end" font-family="{SANS}" font-size="2.8" fill="{CREAM}">500 ml</text>
 </g>"""
 

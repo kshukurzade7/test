@@ -21,9 +21,9 @@ from photo import flat_label, embedded_fonts, emblem, CREAM  # noqa: E402
 
 GOLD = "#B8934A"
 FLAVOURS = {
-    "apricot": dict(key="apricot", name="Apricot", local="Ərik", band="#E8892E", accent="#E0701A"),
-    "pomegranate": dict(key="pomegranate", name="Pomegranate", local="Nar", band="#A82334", accent="#B0192F"),
-    "grape": dict(key="grape", name="Grape", local="Üzüm", band="#573259", accent="#5B2453"),
+    "apricot": dict(key="apricot", name="Apricot", ru_name="Абрикос", band="#E8892E", accent="#E0701A"),
+    "pomegranate": dict(key="pomegranate", name="Pomegranate", ru_name="Гранат", band="#A82334", accent="#B0192F"),
+    "grape": dict(key="grape", name="Grape", ru_name="Виноград", band="#573259", accent="#5B2453"),
 }
 # photo label id -> flavour, bottle axis (cx) and radius in photo pixels.
 # C runs off the right edge of the photo, so its right label edge is mirrored.

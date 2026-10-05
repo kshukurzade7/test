@@ -31,15 +31,21 @@ BODY = "#4A3B32"
 GOLD = "#B8934A"
 
 FLAVORS = [
-    dict(key="apricot", name="Apricot", band="#E8892E", accent="#D96A12",
-         story="Sun-ripened apricots from the orchards of Azerbaijan, pressed and bottled. Nothing added, nothing taken away.",
-         ingredients="Apricot juice (100%)."),
-    dict(key="pomegranate", name="Pomegranate", band="#A82334", accent="#A8172C",
-         story="Ruby pomegranates from Azerbaijan, gently pressed for a deep, tart juice. Nothing added, nothing taken away.",
-         ingredients="Pomegranate juice (100%)."),
-    dict(key="grape", name="Grape", band="#573259", accent="#5B2453",
-         story="Dark grapes from Azerbaijan's sunlit vineyards, pressed into a rich, rounded juice. Nothing added, nothing taken away.",
-         ingredients="Grape juice (100%)."),
+    dict(key="apricot", name="Apricot", ru_name="Абрикос", band="#E8892E", accent="#D96A12",
+         title="Apricot juice", ru_title="Абрикосовый сок",
+         story="Sun-ripened apricots from Azerbaijan's orchards. Nothing added.",
+         ru_story="Спелые абрикосы из садов Азербайджана. Ничего лишнего.",
+         ingredients="Apricot juice (100%).", ru_ingredients="Абрикосовый сок (100%)."),
+    dict(key="pomegranate", name="Pomegranate", ru_name="Гранат", band="#A82334", accent="#A8172C",
+         title="Pomegranate juice", ru_title="Гранатовый сок",
+         story="Ruby pomegranates from Azerbaijan, gently pressed. Nothing added.",
+         ru_story="Спелые гранаты из Азербайджана, бережный отжим. Ничего лишнего.",
+         ingredients="Pomegranate juice (100%).", ru_ingredients="Гранатовый сок (100%)."),
+    dict(key="grape", name="Grape", ru_name="Виноград", band="#573259", accent="#5B2453",
+         title="Grape juice", ru_title="Виноградный сок",
+         story="Dark grapes from Azerbaijan's sunlit vineyards. Nothing added.",
+         ru_story="Тёмный виноград с солнечных виноградников Азербайджана.",
+         ingredients="Grape juice (100%).", ru_ingredients="Виноградный сок (100%)."),
 ]
 
 
@@ -71,74 +77,82 @@ def front(f):
 <g transform="translate({cx} 12.5)">{emblem(f['accent'], 5.2)}</g>
 <text x="{cx}" y="30" text-anchor="middle" font-family="{SERIF}" font-weight="500" font-size="13.5" letter-spacing="2.9" fill="{INK}">SHIRÁ</text>
 <line x1="{cx - 7}" y1="34" x2="{cx + 7}" y2="34" stroke="{GOLD}" stroke-width="0.35"/>
-<text x="{cx}" y="43" text-anchor="middle" font-family="{SERIF}" font-style="italic" font-size="{9 if len(f['name']) < 9 else 8}" fill="{f['accent']}">{f['name']}</text>
-<text x="{cx}" y="49.3" text-anchor="middle" font-family="{SANS}" font-size="2.0" letter-spacing="0.5" fill="#6B5A4E">100% NATURAL JUICE · NOT FROM CONCENTRATE</text>
-<g transform="translate(9 84.9)">{az_flag(7)}</g>
-<text x="18.4" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>
-<text x="{FRONT_W - 8}" y="88.6" text-anchor="end" font-family="{SANS}" font-weight="500" font-size="6" fill="{CREAM}">500 ml</text>"""
+<text x="{cx}" y="42" text-anchor="middle" font-family="{SERIF}" font-style="italic" font-size="{9 if len(f['name']) < 9 else 8}" fill="{f['accent']}">{f['name']}</text>
+<text x="{cx}" y="47.6" text-anchor="middle" font-family="{SANS}" font-size="2.0" letter-spacing="0.5" fill="#6B5A4E">100% NATURAL JUICE · NOT FROM CONCENTRATE</text>
+<text x="{cx}" y="51.2" text-anchor="middle" font-family="{SANS}" font-size="2.0" letter-spacing="0.5" fill="#6B5A4E">100% НАТУРАЛЬНЫЙ СОК · ПРЯМОГО ОТЖИМА</text>
+<text x="9" y="66" font-family="{SERIF}" font-style="italic" font-size="6.5" fill="{CREAM}">{f['ru_name']}</text>
+<g transform="translate(9 84.1)">{az_flag(7)}</g>
+<text x="18.4" y="86.1" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>
+<text x="18.4" y="89.1" font-family="{SANS}" font-size="2.0" letter-spacing="0.12" fill="{CREAM}">ПРОИЗВЕДЕНО В АЗЕРБАЙДЖАНЕ</text>
+<text x="{FRONT_W - 7}" y="88.6" text-anchor="end" font-family="{SANS}" font-weight="500" font-size="5.8" fill="{CREAM}">500 ml</text>"""
 
 
 def back(f):
     x0 = FRONT_W + 7
     bx = x0 + 45
     sans = f'font-family="{SANS}" fill="{BODY}"'
+    ru_col = "#6E5D51"
 
     def head(x, y, t):
-        return f'<text x="{x}" y="{y:.2f}" font-size="2.0" letter-spacing="0.5" font-weight="500" {sans}>{t}</text>'
+        return f'<text x="{x}" y="{y:.2f}" font-size="2.0" letter-spacing="0.45" font-weight="500" {sans}>{t}</text>'
 
-    def body(lines, x, y):
-        return text_lines(lines, x, y, 2.4, 3.05, font_family=SANS, fill=BODY)
+    def body(lines, x, y, fill=BODY):
+        return text_lines(lines, x, y, 2.35, 2.9, font_family=SANS, fill=fill)
 
     out = [
         f'<rect x="{FRONT_W}" y="{-BLEED}" width="{TRIM_W - FRONT_W + BLEED}" height="{TRIM_H + 2 * BLEED}" fill="{CREAM}"/>',
         f'<rect x="{FRONT_W}" y="{-BLEED}" width="{TRIM_W - FRONT_W + BLEED}" height="{BLEED + 2.2}" fill="{f["band"]}"/>',
         f'<rect x="{FRONT_W}" y="{TRIM_H - 2.2}" width="{TRIM_W - FRONT_W + BLEED}" height="{BLEED + 2.2}" fill="{f["band"]}"/>',
-        f'<g transform="translate({x0 + 3} 12)">{emblem(f["accent"], 2.7)}</g>',
-        f'<text x="{x0 + 8}" y="13.9" font-family="{SERIF}" font-size="5.8" letter-spacing="1.3" fill="{INK}">SHIRÁ</text>',
-        f'<text x="{x0 + 8}" y="19.6" font-family="{SERIF}" font-style="italic" font-size="4.2" fill="{f["accent"]}">{f["name"]} juice</text>',
+        f'<g transform="translate({x0 + 3} 11.5)">{emblem(f["accent"], 2.7)}</g>',
+        f'<text x="{x0 + 8}" y="13.4" font-family="{SERIF}" font-size="5.8" letter-spacing="1.3" fill="{INK}">SHIRÁ</text>',
+        f'<text x="{x0 + 8}" y="19" font-family="{SERIF}" font-style="italic" font-size="4.0" fill="{f["accent"]}">{f["title"]} · {f["ru_title"]}</text>',
+        text_lines(wrap(f["story"], 68), x0, 25, 2.8, 3.3, font_family=SERIF, font_style="italic", fill=BODY),
+        text_lines(wrap(f["ru_story"], 70), x0, 28.6, 2.8, 3.3, font_family=SERIF, font_style="italic", fill=ru_col),
+        f'<line x1="{x0}" y1="31.4" x2="{TRIM_W - 7}" y2="31.4" stroke="#D8C9B6" stroke-width="0.2"/>',
     ]
-    y = 26.5
-    story = wrap(f["story"], 66)
-    out.append(text_lines(story, x0, y, 2.9, 3.6, font_family=SERIF, font_style="italic", fill=BODY))
-    y += len(story) * 3.6
-    top = y + 6.5
-    out.append(f'<line x1="{x0}" y1="{top - 2.6:.2f}" x2="{TRIM_W - 7}" y2="{top - 2.6:.2f}" stroke="#D8C9B6" stroke-width="0.2"/>')
 
-    # left column: ingredients, storage, recycling, best before
-    y = top + 1
-    out.append(head(x0, y, "INGREDIENTS"))
-    ing = wrap(f["ingredients"] + " No added sugar, water, colours or preservatives. Pasteurised.", 28)
-    out.append(body(ing, x0, y + 3.2))
-    y += 3.2 + len(ing) * 3.05 + 1.6
-    out.append(head(x0, y, "STORAGE"))
-    st = wrap("Shake well. Store cool and dry, away from sunlight. "
-              "Once opened, refrigerate and drink within 3 days.", 28)
-    out.append(body(st, x0, y + 3.2))
-    y += 3.2 + len(st) * 3.05 + 1.6
+    # left column: ingredients, storage, recycling (English, then Russian)
+    y = 35
+    out.append(head(x0, y, "INGREDIENTS · СОСТАВ"))
+    for lines, fill in ((wrap(f["ingredients"] + " No added sugar, water, colours or preservatives.", 30), BODY),
+                        (wrap(f["ru_ingredients"] + " Без сахара, воды, красителей и консервантов.", 30), ru_col)):
+        out.append(body(lines, x0, y + 3))
+        y += len(lines) * 2.9
+    y += 4
+    out.append(head(x0, y, "STORAGE · ХРАНЕНИЕ"))
+    for lines, fill in ((wrap("Shake well. Once opened, refrigerate and drink within 3 days.", 30), BODY),
+                        (wrap("Взболтать. После вскрытия хранить в холодильнике до 3 суток.", 30), ru_col)):
+        out.append(body(lines, x0, y + 3))
+        y += len(lines) * 2.9
+    y += 4.2
     out.append(f'<g transform="translate({x0 + 0.2} {y - 3.4:.2f}) scale(0.4)" fill="none" stroke="{BODY}" stroke-width="0.4">'
                '<path d="M 2.5 0 L 4.7 0 L 4.7 1.8 Q 6 2.8 6 5 L 6 10.5 Q 6 11.2 5.3 11.2 L 1.9 11.2 '
                'Q 1.2 11.2 1.2 10.5 L 1.2 5 Q 1.2 2.8 2.5 1.8 Z"/></g>')
-    out.append(body(["Glass bottle. Please recycle."], x0 + 4.2, y))
-    y += 4.2
-    out.append(body(["Best before / Lot: see cap."], x0, y))
-    out.append(body(["Producer: [ name, address ],", "Azerbaijan · [ website ]"], x0, y + 3.6))
+    out.append(body(["Glass. Please recycle.", "Стекло. Сдайте в переработку."], x0 + 4.2, y))
 
-    # right column: nutrition table + barcode area
-    y = top + 1
-    out.append(head(bx, y, "NUTRITION"))
-    out.append(f'<text x="{bx + 35}" y="{y:.2f}" font-size="1.8" text-anchor="end" {sans}>per 100 ml</text>')
-    out.append(f'<line x1="{bx}" y1="{y + 1:.2f}" x2="{bx + 35}" y2="{y + 1:.2f}" stroke="{BODY}" stroke-width="0.3"/>')
-    for i, r in enumerate(["Energy", "Fat", "-saturates", "Carbohydrate", "-sugars", "Protein", "Salt"]):
-        yy = y + 3.9 + i * 2.85
-        sub = r.startswith("-")
-        name = ("of which " + r[1:]) if sub else r
-        out.append(f'<text x="{bx + (1.8 if sub else 0)}" y="{yy:.2f}" font-size="2.35" {sans}>{name}</text>'
-                   f'<text x="{bx + 35}" y="{yy:.2f}" font-size="2.35" text-anchor="end" {sans}>TBC</text>'
-                   f'<line x1="{bx}" y1="{yy + 0.75:.2f}" x2="{bx + 35}" y2="{yy + 0.75:.2f}" stroke="#C9B9A6" stroke-width="0.15"/>')
-    by = y + 3.9 + 6 * 2.85 + 2.6
+    # right column: nutrition + barcode + dates/producer
+    y = 35
+    out.append(f'<text x="{bx}" y="{y:.2f}" font-size="2.0" letter-spacing="0.12" font-weight="500" {sans}>NUTRITION · ПИЩ. ЦЕННОСТЬ</text>')
+    out.append(f'<text x="{bx + 35}" y="{y + 2.8:.2f}" font-size="1.8" text-anchor="end" {sans}>per 100 ml · на 100 мл</text>')
+    out.append(f'<line x1="{bx}" y1="{y + 3.7:.2f}" x2="{bx + 35}" y2="{y + 3.7:.2f}" stroke="{BODY}" stroke-width="0.3"/>')
+    rows = [("Energy", "Энергия"), ("Fat", "Жиры"), ("-saturates", "насыщ."), ("Carbohydrate", "Углеводы"),
+            ("-sugars", "сахара"), ("Protein", "Белки"), ("Salt", "Соль")]
+    for i, (en, ru) in enumerate(rows):
+        yy = y + 6.6 + i * 2.75
+        sub = en.startswith("-")
+        name = f"{'– ' + en[1:] if sub else en} · {ru}"
+        out.append(f'<text x="{bx + (1.6 if sub else 0)}" y="{yy:.2f}" font-size="2.15" {sans}>{name}</text>'
+                   f'<text x="{bx + 35}" y="{yy:.2f}" font-size="2.15" text-anchor="end" {sans}>TBC</text>'
+                   f'<line x1="{bx}" y1="{yy + 0.7:.2f}" x2="{bx + 35}" y2="{yy + 0.7:.2f}" stroke="#C9B9A6" stroke-width="0.15"/>')
+    by = y + 6.6 + 6 * 2.75 + 2.4
     out.append(f'<rect x="{bx + 2}" y="{by:.2f}" width="31" height="21" fill="#fff" stroke="#9C8B7C" stroke-width="0.2"/>'
                f'<text x="{bx + 17.5}" y="{by + 9.5:.2f}" text-anchor="middle" font-size="2.1" {sans}>EAN-13 barcode</text>'
                f'<text x="{bx + 17.5}" y="{by + 12.6:.2f}" text-anchor="middle" font-size="1.7" fill="#9C8B7C" font-family="{SANS}">31 x 21 mm area</text>')
+
+    # full-width footer
+    out.append(text_lines(["Best before / Lot: see cap · Годен до / партия: см. крышку · 500 ml / 500 мл",
+                           "Producer / Изготовитель: [ name, address ], Azerbaijan / Азербайджан"],
+                          x0, 87.6, 2.15, 2.75, font_family=SANS, fill=BODY))
     return "".join(out)
 
 
