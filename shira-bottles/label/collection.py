@@ -28,6 +28,31 @@ wrap, text_lines = base.wrap, base.text_lines
 ART = {**HERO, **FRUITS}
 OUT = HERE / "collection"
 
+# "original" reproduces the first proof's design exactly (original mark, no flag);
+# "current" uses the redrawn citrus-slice mark and the small flag.
+STYLE = "current"
+
+
+def original_emblem(c, r):
+    """The original SHIRÁ mark from the first proof: disc with eight rounded spokes."""
+    import math
+    spokes = "".join(
+        f'<line x1="0" y1="0" x2="{r*0.86*math.cos(a):.3f}" y2="{r*0.86*math.sin(a):.3f}" '
+        f'stroke="{CREAM}" stroke-width="{r*0.17:.3f}" stroke-linecap="round"/>'
+        for a in [k * math.pi / 4 + math.pi / 8 for k in range(8)])
+    return f'<circle r="{r}" fill="{c}"/>{spokes}<circle r="{r*0.26:.3f}" fill="{CREAM}"/>'
+
+
+def mark(c, r):
+    return original_emblem(c, r) if STYLE == "original" else emblem(c, r)
+
+
+def origin_line():
+    if STYLE == "original":
+        return f'<text x="9" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>'
+    return (f'<g transform="translate(9 84.9)">{az_flag(7)}</g>'
+            f'<text x="18.4" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>')
+
 # band = colour block, accent = flavour name + mark, juice = liquid colour for mockups
 FLAVOURS = [
     dict(key="blackcurrant", name="Blackcurrant", band="#3B2240", accent="#4A2752", juice="#2A0E2C",
@@ -67,13 +92,12 @@ def front(f):
 <rect x="{-BLEED}" y="{SPLIT}" width="{FRONT_W + BLEED}" height="{band_h + BLEED}" fill="{f['band']}"/>
 <clipPath id="band-{f['key']}"><rect x="{-BLEED}" y="{SPLIT}" width="{FRONT_W + BLEED}" height="{band_h + BLEED}"/></clipPath>
 <g clip-path="url(#band-{f['key']})">{art}</g>
-<g transform="translate({cx} 12.5)">{emblem(f['accent'], 5.2)}</g>
+<g transform="translate({cx} 12.5)">{mark(f['accent'], 5.2)}</g>
 <text x="{cx}" y="30" text-anchor="middle" font-family="{SERIF}" font-weight="500" font-size="13.5" letter-spacing="2.9" fill="{INK}">SHIRÁ</text>
 <line x1="{cx - 7}" y1="34" x2="{cx + 7}" y2="34" stroke="{GOLD}" stroke-width="0.35"/>
 <text x="{cx}" y="43" text-anchor="middle" font-family="{SERIF}" font-style="italic" font-size="{name_size}" fill="{f['accent']}">{f['name']}</text>
 <text x="{cx}" y="49.3" text-anchor="middle" font-family="{SANS}" font-size="2.0" letter-spacing="0.5" fill="#6B5A4E">100% NATURAL JUICE · NOT FROM CONCENTRATE</text>
-<g transform="translate(9 84.9)">{az_flag(7)}</g>
-<text x="18.4" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>
+{origin_line()}
 <text x="{FRONT_W - 8}" y="88.6" text-anchor="end" font-family="{SANS}" font-weight="500" font-size="6" fill="{CREAM}">500 ml</text>"""
 
 
@@ -92,7 +116,7 @@ def back(f):
         f'<rect x="{FRONT_W}" y="{-BLEED}" width="{TRIM_W - FRONT_W + BLEED}" height="{TRIM_H + 2 * BLEED}" fill="{CREAM}"/>',
         f'<rect x="{FRONT_W}" y="{-BLEED}" width="{TRIM_W - FRONT_W + BLEED}" height="{BLEED + 2.2}" fill="{f["band"]}"/>',
         f'<rect x="{FRONT_W}" y="{TRIM_H - 2.2}" width="{TRIM_W - FRONT_W + BLEED}" height="{BLEED + 2.2}" fill="{f["band"]}"/>',
-        f'<g transform="translate({x0 + 3} 12)">{emblem(f["accent"], 2.7)}</g>',
+        f'<g transform="translate({x0 + 3} 12)">{mark(f["accent"], 2.7)}</g>',
         f'<text x="{x0 + 8}" y="13.9" font-family="{SERIF}" font-size="5.8" letter-spacing="1.3" fill="{INK}">SHIRÁ</text>',
         f'<text x="{x0 + 8}" y="19.6" font-family="{SERIF}" font-style="italic" font-size="4.2" fill="{f["accent"]}">{f["name"]} juice</text>',
     ]
@@ -145,6 +169,9 @@ def svg(f, with_dieline):
 
 
 def main():
+    global STYLE, OUT
+    if "--original" in sys.argv:
+        STYLE, OUT = "original", HERE / "collection-original"
     OUT.mkdir(exist_ok=True)
     for f in FLAVOURS:
         (OUT / f"shira-{f['key']}-label.svg").write_text(svg(f, True), encoding="utf-8")
