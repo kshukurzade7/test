@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "brand-packaging": {
+      "source": "arnabbagxd/brand-building-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-packaging/SKILL.md",
+      "computedHash": "f2a1d320d181aa1729e728c93f49ceb9e9393da6bb8441fba65989e136cbb7b9"
+    }
+  }
+}
