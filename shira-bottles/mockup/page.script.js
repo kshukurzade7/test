@@ -1,91 +1,3 @@
-<title>SHIRÁ Bottle Mockup</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Montserrat:wght@500;600&display=swap">
-<style>
-/* Layout: the live 3D lineup leads; the real-photo version sits beside it on wide screens and below it on phones. */
-:root {
-  --bg: #EFE6DA; --panel: #F8F3EC; --fg: #33261F; --muted: #7B6B5F; --line: #DDCDBA;
-  --accent: #A8172C; --accent-fg: #FBF5EC;
-  --display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --ui: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #1C1714; --panel: #26201B; --fg: #F1E8DC; --muted: #B3A394; --line: #40352D;
-  --accent: #E0697C; --accent-fg: #1C1714; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #1C1714; --panel: #26201B; --fg: #F1E8DC; --muted: #B3A394; --line: #40352D;
-  --accent: #E0697C; --accent-fg: #1C1714; color-scheme: dark }
-* { box-sizing: border-box }
-body { background: var(--bg); color: var(--fg); font: 500 14px/1.6 var(--ui); padding-inline: 16px; padding-block: 28px 48px }
-.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 18px }
-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px }
-h1 { font: 500 clamp(30px, 4.4vw, 42px)/1.1 var(--display); letter-spacing: .14em; margin: 0 }
-h1 span { font-style: italic; letter-spacing: 0; color: var(--muted); font-size: .56em; margin-left: 12px }
-.tag { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted) }
-.grid { display: grid; gap: 18px; grid-template-columns: 1fr }
-@media (min-width: 900px) { .grid { grid-template-columns: 1.45fr 1fr } }
-.card { display: grid; gap: 10px; min-width: 0; align-content: start }
-.card h2 { font: 600 11px/1.3 var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 }
-.stage { position: relative; width: 100%; aspect-ratio: 5 / 4; border-radius: 6px; overflow: hidden; background: #d9c6ae }
-.stage canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab }
-.stage canvas:active { cursor: grabbing }
-.status { position: absolute; inset: 0; display: grid; place-items: center; color: #5c4a3c; font-size: 13px; letter-spacing: .08em; text-align: center; padding: 20px; pointer-events: none }
-.hint { position: absolute; left: 14px; bottom: 12px; font-size: 11px; letter-spacing: .1em; color: rgba(255,248,238,.9); text-shadow: 0 1px 2px rgba(0,0,0,.4); pointer-events: none }
-.photo { width: 100%; aspect-ratio: 5 / 4; object-fit: cover; object-position: 50% 78%; border-radius: 6px; display: block; max-width: 100% }
-.cap { font-size: 12.5px; color: var(--muted); font-weight: 400; margin: 0 }
-.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
-.bar button { font: 600 12px/1 var(--ui); letter-spacing: .08em; text-transform: uppercase; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; cursor: pointer }
-.bar button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent) }
-.bar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
-.bar .sep { flex: 1 }
-.specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px 28px; border-top: 1px solid var(--line); padding-top: 18px }
-.specs div { min-width: 0 }
-.specs h3 { font: 600 11px/1.3 var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px }
-.specs p { margin: 0; font-weight: 400; font-size: 13.5px }
-</style>
-
-<div class="wrap">
-  <header>
-    <h1>SHIRÁ <span>Apricot · Pomegranate · Grape</span></h1>
-    <div class="tag">500 ml glass longneck · mockups</div>
-  </header>
-
-  <div class="grid">
-    <section class="card" aria-labelledby="h-3d">
-      <h2 id="h-3d">Live 3D mockup</h2>
-      <div class="stage" id="stage">
-        <div class="status" id="status">Building the bottles…</div>
-        <div class="hint" id="hint" hidden>Drag to turn · scroll or pinch to zoom</div>
-      </div>
-      <div class="bar" role="toolbar" aria-label="View">
-        <button id="v-front" aria-pressed="true">Front</button>
-        <button id="v-side" aria-pressed="false">Side</button>
-        <button id="v-back" aria-pressed="false">Back label</button>
-        <span class="sep"></span>
-        <button id="v-spin" aria-pressed="false">Turntable</button>
-      </div>
-    </section>
-    <section class="card" aria-labelledby="h-photo">
-      <h2 id="h-photo">On a real bottle photo</h2>
-      <img class="photo" src="real-photo.png" alt="Photo of three real glass juice bottles on a wooden table outdoors, with the SHIRÁ Apricot, Pomegranate and Grape labels placed onto them.">
-      <p class="cap">Your outdoor photo of real glass bottles, with the SHIRÁ labels placed onto the bottles digitally and lit to match. The source photo is small, so it looks soft up close.</p>
-    </section>
-  </div>
-
-  <div class="specs">
-    <div><h3>Bottle</h3><p>Clear glass longneck, 500 ml, long tapering shoulder, metallic gold screw cap.</p></div>
-    <div><h3>Neck collar</h3><p>Cream paper ring under the cap with the SHIRÁ citrus mark in the flavour colour.</p></div>
-    <div><h3>Body label</h3><p>190 × 95 mm wrap: cream top with SHIRÁ and flavour, coloured band with a tone-on-tone fruit, full back panel.</p></div>
-    <div><h3>Juice</h3><p>Cloudy apricot, ruby pomegranate and deep purple grape, filled into the neck.</p></div>
-  </div>
-</div>
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
-} }
-</script>
-<script type="module">
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -125,46 +37,7 @@ function collarCanvas(accent) {
   return c;
 }
 
-// warm studio wall with soft out-of-focus shelf bottles
-function wallCanvas() {
-  const c = document.createElement('canvas'); c.width = 2048; c.height = 1024;
-  const g = c.getContext('2d');
-  const grd = g.createLinearGradient(0, 0, 0, 1024);
-  grd.addColorStop(0, '#CDB79C'); grd.addColorStop(0.55, '#E3D2BC'); grd.addColorStop(1, '#C9B092');
-  g.fillStyle = grd; g.fillRect(0, 0, 2048, 1024);
-  const glow = g.createRadialGradient(1024, 420, 40, 1024, 420, 900);
-  glow.addColorStop(0, 'rgba(255,246,230,0.7)'); glow.addColorStop(1, 'rgba(255,246,230,0)');
-  g.fillStyle = glow; g.fillRect(0, 0, 2048, 1024);
-  g.filter = 'blur(26px)';
-  [[260, '#8E2A2A'], [430, '#C9852E'], [1620, '#5A1E3E'], [1790, '#B8662A']].forEach(([x, col]) => {
-    g.fillStyle = col; g.globalAlpha = 0.55;
-    g.beginPath(); g.roundRect(x - 55, 380, 110, 520, 40); g.fill();
-    g.fillRect(x - 22, 170, 44, 230);
-    g.fillStyle = '#EDE3D2'; g.globalAlpha = 0.6; g.fillRect(x - 56, 660, 112, 170);
-  });
-  g.globalAlpha = 1; g.filter = 'none';
-  return c;
-}
-
-function woodCanvas() {
-  const c = document.createElement('canvas'); c.width = 2048; c.height = 1024;
-  const g = c.getContext('2d');
-  g.fillStyle = '#8A5A33'; g.fillRect(0, 0, 2048, 1024);
-  let seed = 9; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  for (let y = 0; y < 1024; y += 2) {
-    const v = Math.sin(y * 0.03) * 0.5 + Math.sin(y * 0.011 + 2) * 0.35 + Math.sin(y * 0.17) * 0.15;
-    const l = 0.86 + v * 0.14;
-    g.fillStyle = `rgba(${168 * l | 0},${112 * l | 0},${66 * l | 0},0.6)`; g.fillRect(0, y, 2048, 2);
-  }
-  for (let i = 0; i < 1600; i++) {
-    g.strokeStyle = `rgba(70,40,18,${0.04 + rnd() * 0.1})`; g.lineWidth = 0.6 + rnd() * 1.6;
-    const y = rnd() * 1024, x = rnd() * 2048, len = 120 + rnd() * 600;
-    g.beginPath(); g.moveTo(x, y); g.bezierCurveTo(x + len * 0.3, y + rnd() * 5 - 2.5, x + len * 0.6, y + rnd() * 5 - 2.5, x + len, y + rnd() * 3 - 1.5); g.stroke();
-  }
-  return c;
-}
-
-
+/*HELPERS*/
 
 // ---------------------------------------------------------------- scene
 let renderer;
@@ -311,4 +184,3 @@ resize();
 statusEl.remove();
 document.getElementById('hint').hidden = false;
 requestAnimationFrame(frame);
-</script>

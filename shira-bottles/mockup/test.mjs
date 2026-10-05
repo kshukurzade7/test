@@ -12,7 +12,11 @@ await p.route('https://cdn.jsdelivr.net/npm/three@0.186.1/**', (r) => {
 });
 await p.route('https://fonts.googleapis.com/**', (r) => r.abort());
 const html = readFileSync('index.html', 'utf8');
-await p.route('http://mock.local/', (r) => r.fulfill({ body: `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${html}`, contentType: 'text/html' }));
+await p.route('http://mock.local/**', (r) => {
+  const path = new URL(r.request().url()).pathname;
+  if (path === '/') return r.fulfill({ body: `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${html}`, contentType: 'text/html' });
+  r.fulfill({ body: readFileSync('.' + path), contentType: 'image/png' });
+});
 await p.goto('http://mock.local/');
 await p.waitForFunction(() => window.READY, null, { timeout: 120000 });
 await p.waitForTimeout(4000);
