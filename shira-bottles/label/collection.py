@@ -48,7 +48,7 @@ def mark(c, r):
 
 
 def origin_line():
-    if STYLE == "original":
+    if STYLE in ("original", "citrus"):
         return f'<text x="9" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>'
     return (f'<g transform="translate(9 84.9)">{az_flag(7)}</g>'
             f'<text x="18.4" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>')
@@ -75,6 +75,8 @@ FLAVOURS = [
          story="Wild rosehips, naturally rich in vitamin C, pressed into a bright, tangy juice. Nothing added."),
     dict(key="hawthorn", name="Hawthorn", band="#8A3A2F", accent="#7E3128", juice="#A8452A",
          story="Wild hawthorn berries from Azerbaijan's mountains, pressed for a gentle, fruity juice. Nothing added."),
+    dict(key="pomegranate", name="Pomegranate", band="#A82334", accent="#A8172C", juice="#B00E2C",
+         story="Ruby pomegranates from Azerbaijan, gently pressed for a deep, tart juice. Nothing added, nothing taken away."),
     dict(key="apple", name="Apple", band="#5F9A3A", accent="#4E842E", juice="#E2B24A",
          story="Crisp apples from Azerbaijan's orchards, pressed and bottled for a pure, clear juice. Nothing added."),
 ]
@@ -172,6 +174,8 @@ def main():
     global STYLE, OUT
     if "--original" in sys.argv:
         STYLE, OUT = "original", HERE / "collection-original"
+    if "--citrus" in sys.argv:
+        STYLE, OUT = "citrus", HERE / "collection-citrus"
     OUT.mkdir(exist_ok=True)
     for f in FLAVOURS:
         (OUT / f"shira-{f['key']}-label.svg").write_text(svg(f, True), encoding="utf-8")
