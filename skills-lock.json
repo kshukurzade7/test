@@ -13,6 +13,12 @@
       "skillPath": "skills/brand-packaging/SKILL.md",
       "computedHash": "f2a1d320d181aa1729e728c93f49ceb9e9393da6bb8441fba65989e136cbb7b9"
     },
+    "freeimg-z-image": {
+      "source": "wu529778790/shenzjd-skills",
+      "sourceType": "github",
+      "skillPath": "freeimg-z-image/SKILL.md",
+      "computedHash": "a0176de2739f793eb12975ae23f99621fb602b86223769fe200ee3dd705896db"
+    },
     "nano-banana-2": {
       "source": "prime-skills/runcomfy-agent-skills",
       "sourceType": "github",
