@@ -18,6 +18,12 @@
       "sourceType": "github",
       "skillPath": "nano-banana-2/SKILL.md",
       "computedHash": "1f8e3c29a2ac938e8f8d874a699ebcd4ed49d604cc3b8ea45d2eeadfc84f8382"
+    },
+    "pollinations-image-gen": {
+      "source": "xream/scripts",
+      "sourceType": "github",
+      "skillPath": "skills/pollinations-image-gen/SKILL.md",
+      "computedHash": "3ad0361a7fd7eb2bd36d789799c9af4033e93bf6be4655eb12bd74dfd6a4dabd"
     }
   }
 }
