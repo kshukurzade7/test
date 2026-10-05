@@ -1,0 +1,421 @@
+<title>SHİRƏ Bottle Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@500;600&display=swap">
+<style>
+/* Layout: one centred stage (the 3D bottle) with a slim control bar and spec notes underneath. */
+:root {
+  --bg: #EFE6DA; --panel: #F8F3EC; --fg: #33261F; --muted: #7B6B5F; --line: #DDCDBA;
+  --accent: #8E1B2E; --accent-fg: #FBF5EC;
+  --display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --ui: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1C1714; --panel: #26201B; --fg: #F1E8DC; --muted: #B3A394; --line: #40352D;
+  --accent: #D4566B; --accent-fg: #1C1714; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #1C1714; --panel: #26201B; --fg: #F1E8DC; --muted: #B3A394; --line: #40352D;
+  --accent: #D4566B; --accent-fg: #1C1714; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 500 14px/1.6 var(--ui); padding-inline: 16px; padding-block: 28px 48px }
+.wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 18px }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px }
+h1 { font: 500 clamp(28px, 4.4vw, 40px)/1.1 var(--display); letter-spacing: .08em; margin: 0 }
+h1 span { font-style: italic; letter-spacing: 0; color: var(--muted); font-size: .62em; margin-left: 10px }
+.tag { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted) }
+.stage { position: relative; width: 100%; aspect-ratio: 4 / 5; max-height: 86vh; margin: 0 auto; border-radius: 6px; overflow: hidden; background: #d9c6ae; box-shadow: 0 1px 0 var(--line) }
+@media (min-width: 760px) { .stage { aspect-ratio: 5 / 4 } }
+.stage canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab }
+.stage canvas:active { cursor: grabbing }
+.status { position: absolute; inset: 0; display: grid; place-items: center; color: #5c4a3c; font-size: 13px; letter-spacing: .08em; text-align: center; padding: 20px; pointer-events: none }
+.hint { position: absolute; left: 14px; bottom: 12px; font-size: 11px; letter-spacing: .1em; color: rgba(255,248,238,.85); text-shadow: 0 1px 2px rgba(0,0,0,.35); pointer-events: none }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.bar button { font: 600 12px/1 var(--ui); letter-spacing: .08em; text-transform: uppercase; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; cursor: pointer }
+.bar button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent) }
+.bar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.bar .sep { flex: 1 }
+.specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px 28px; border-top: 1px solid var(--line); padding-top: 18px }
+.specs div { min-width: 0 }
+.specs h2 { font: 600 11px/1.3 var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px }
+.specs p { margin: 0; font-weight: 400; font-size: 13.5px }
+.note { font-size: 12px; color: var(--muted); font-weight: 400; margin: 0 }
+@media (prefers-reduced-motion: reduce) { .bar button { transition: none } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>SHİRƏ <span>Nar · Pomegranate</span></h1>
+    <div class="tag">500 ml glass longneck · 3D mockup</div>
+  </header>
+
+  <div class="stage" id="stage">
+    <div class="status" id="status">Building the bottle…</div>
+    <div class="hint" id="hint" hidden>Drag to turn the bottle · scroll or pinch to zoom</div>
+  </div>
+
+  <div class="bar" role="toolbar" aria-label="View">
+    <button id="v-front" aria-pressed="true">Front</button>
+    <button id="v-side" aria-pressed="false">Side</button>
+    <button id="v-back" aria-pressed="false">Back</button>
+    <span class="sep"></span>
+    <button id="v-spin" aria-pressed="false">Turntable</button>
+  </div>
+
+  <div class="specs">
+    <div><h2>Bottle</h2><p>Clear flint glass longneck, 500 ml, long tapering shoulder, metallic gold screw cap.</p></div>
+    <div><h2>Neck collar</h2><p>Off-white paper ring under the cap with the geometric star mark and fine gold rules.</p></div>
+    <div><h2>Body label</h2><p>Wrap label, 60% cream with the serif SHİRƏ logo and flavour, 40% deep pomegranate red with a fine fruit outline.</p></div>
+    <div><h2>Liquid</h2><p>Deep berry red, filled into the neck with a small air gap under the collar.</p></div>
+  </div>
+  <p class="note">Rendered live in your browser with physically based glass and lighting. Printed colours, paper texture and glass tint will vary slightly in real life.</p>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const stage = document.getElementById('stage');
+const statusEl = document.getElementById('status');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------------------------------------------------------------- brand
+const BRAND = {
+  name: 'SHİRƏ', flavour: 'Pomegranate', local: 'Nar',
+  cream: '#F5EEE2', ink: '#33241D', gold: '#B38B45',
+  red: '#7C1426', redAccent: '#8E1830',
+};
+const SERIF = "'Cormorant Garamond', Georgia, serif";
+const SANS = "'Montserrat', 'Helvetica Neue', Arial, sans-serif";
+
+async function fontsReady() {
+  try {
+    await Promise.all([
+      document.fonts.load(`500 200px ${SERIF}`), document.fonts.load(`italic 500 200px ${SERIF}`),
+      document.fonts.load(`500 60px ${SANS}`), document.fonts.load(`600 60px ${SANS}`),
+    ]);
+  } catch (e) { /* fall back to system serif / sans */ }
+}
+
+// draw text with manual letter spacing (centre / left / right aligned)
+function spaced(g, text, x, y, spacing, align = 'center') {
+  const chars = [...text];
+  const widths = chars.map((c) => g.measureText(c).width);
+  const total = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
+  let cx = align === 'center' ? x - total / 2 : align === 'right' ? x - total : x;
+  g.textAlign = 'left';
+  chars.forEach((c, i) => { g.fillText(c, cx, y); cx += widths[i] + spacing; });
+}
+
+// the geometric star mark: a disc with an eight-point star
+function starMark(g, x, y, r, fill, cut) {
+  g.save(); g.translate(x, y);
+  g.fillStyle = fill; g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.fill();
+  g.fillStyle = cut; g.beginPath();
+  for (let i = 0; i < 16; i++) {
+    const a = -Math.PI / 2 + i * Math.PI / 8, rr = i % 2 ? r * 0.36 : r * 0.78;
+    g.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+  }
+  g.closePath(); g.fill();
+  g.fillStyle = fill; g.beginPath(); g.arc(0, 0, r * 0.16, 0, Math.PI * 2); g.fill();
+  g.restore();
+}
+
+// fine pomegranate outline (cross-section with crown and seed chambers)
+function pomegranateOutline(g, cx, cy, r, stroke) {
+  g.save(); g.strokeStyle = stroke; g.lineJoin = 'round'; g.lineCap = 'round';
+  g.lineWidth = r * 0.022;
+  // crown
+  g.beginPath();
+  const cw = r * 0.26, ct = cy - r * 0.96;
+  g.moveTo(cx - cw, ct + r * 0.06);
+  [[-1.2, -0.3], [-0.55, -0.14], [-0.3, -0.36], [0, -0.16], [0.3, -0.36], [0.55, -0.14], [1.2, -0.3]]
+    .forEach(([dx, dy]) => g.lineTo(cx + dx * cw * 0.85, ct + dy * r));
+  g.lineTo(cx + cw, ct + r * 0.06); g.stroke();
+  // rind and pith
+  g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke();
+  g.lineWidth = r * 0.012; g.beginPath(); g.arc(cx, cy, r * 0.88, 0, Math.PI * 2); g.stroke();
+  // membranes
+  const mem = [0.3, 1.35, 2.4, 3.45, 4.5, 5.55];
+  mem.forEach((a) => { g.beginPath(); g.moveTo(cx + Math.cos(a) * r * 0.14, cy + Math.sin(a) * r * 0.14);
+    g.quadraticCurveTo(cx + Math.cos(a + 0.18) * r * 0.5, cy + Math.sin(a + 0.18) * r * 0.5, cx + Math.cos(a) * r * 0.86, cy + Math.sin(a) * r * 0.86); g.stroke(); });
+  g.beginPath(); g.arc(cx, cy, r * 0.13, 0, Math.PI * 2); g.stroke();
+  // arils: small faceted outlines inside the chambers
+  let seed = 3; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const step = r * 0.12;
+  for (let iy = -8; iy <= 8; iy++) for (let ix = -8; ix <= 8; ix++) {
+    const x = (ix + (iy & 1) * 0.5) * step + (rnd() - 0.5) * step * 0.2, y = iy * step * 0.87 + (rnd() - 0.5) * step * 0.2;
+    const d = Math.hypot(x, y); if (d > r * 0.8 || d < r * 0.2) continue;
+    const a = Math.atan2(y, x);
+    if (mem.some((m) => Math.abs(Math.sin(a - m)) * d < step * 0.5 && Math.cos(a - m) > 0)) continue;
+    const s = step * 0.4;
+    g.save(); g.translate(cx + x, cy + y); g.rotate(a + (rnd() - 0.5) * 0.6);
+    g.beginPath(); g.moveTo(-s, 0); g.quadraticCurveTo(-s * 0.9, -s * 0.95, 0, -s * 0.9); g.quadraticCurveTo(s * 1.2, -s * 0.6, s * 1.1, 0);
+    g.quadraticCurveTo(s * 1.2, s * 0.6, 0, s * 0.9); g.quadraticCurveTo(-s * 0.9, s * 0.95, -s, 0); g.stroke();
+    g.restore();
+  }
+  g.restore();
+}
+
+// body label: 190 x 95 mm wrap, front panel = left half, back panel = right half
+function bodyLabelCanvas() {
+  const W = 4096, H = 2048, P = W / 2, split = H * 0.6;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  // paper
+  g.fillStyle = BRAND.cream; g.fillRect(0, 0, W, H);
+  g.fillStyle = BRAND.red; g.fillRect(0, split, W, H - split);
+  // fine paper grain
+  const grain = g.createImageData(W, 64);
+  for (let i = 0; i < grain.data.length; i += 4) { const v = Math.random() * 255; grain.data[i] = grain.data[i + 1] = grain.data[i + 2] = v; grain.data[i + 3] = 7; }
+  const gc = document.createElement('canvas'); gc.width = W; gc.height = 64; gc.getContext('2d').putImageData(grain, 0, 0);
+  for (let y = 0; y < H; y += 64) g.drawImage(gc, 0, y);
+
+  // ---- front panel
+  g.save();
+  g.beginPath(); g.rect(0, split, P, H - split); g.clip();
+  pomegranateOutline(g, P * 0.7, split + (H - split) * 0.62, (H - split) * 0.62, 'rgba(255,236,228,0.24)');
+  g.restore();
+  starMark(g, P / 2, 250, 92, BRAND.redAccent, BRAND.cream);
+  g.fillStyle = BRAND.ink; g.font = `500 300px ${SERIF}`; g.textBaseline = 'alphabetic';
+  spaced(g, BRAND.name, P / 2, 670, 62);
+  g.fillStyle = BRAND.gold; g.fillRect(P / 2 - 150, 735, 300, 5);
+  g.fillStyle = BRAND.redAccent; g.font = `italic 500 190px ${SERIF}`; g.textAlign = 'center';
+  g.fillText(BRAND.flavour, P / 2, 935);
+  g.fillStyle = '#4F4037'; g.font = `600 60px ${SANS}`;
+  spaced(g, '100% NATURAL JUICE · NOT FROM CONCENTRATE', P / 2, 1080, 11);
+  g.fillStyle = BRAND.cream; g.font = `italic 500 160px ${SERIF}`; g.textAlign = 'left';
+  g.fillText(BRAND.local, 190, split + 250);
+  g.font = `500 48px ${SANS}`; spaced(g, 'PRODUCT OF AZERBAIJAN', 194, H - 120, 14, 'left');
+  g.font = `600 118px ${SANS}`; g.textAlign = 'right'; g.fillText('500 ml', P - 180, H - 110);
+
+  // ---- back panel
+  const bx = P + 210;
+  starMark(g, bx + 46, 236, 46, BRAND.redAccent, BRAND.cream);
+  g.fillStyle = BRAND.ink; g.font = `500 120px ${SERIF}`; spaced(g, BRAND.name, bx + 130, 278, 24, 'left');
+  g.fillStyle = BRAND.redAccent; g.font = `italic 500 92px ${SERIF}`; g.textAlign = 'left'; g.fillText('Pomegranate juice', bx + 130, 400);
+  g.fillStyle = '#4A3B32'; g.font = `italic 500 74px ${SERIF}`;
+  ['Ruby pomegranates from Azerbaijan, gently pressed', 'for a deep, tart juice. Nothing added.'].forEach((l, i) => g.fillText(l, bx, 560 + i * 92));
+  g.font = `500 44px ${SANS}`;
+  [['INGREDIENTS', 'Pomegranate juice (100%). No added sugar.'], ['STORAGE', 'Shake well. Refrigerate after opening.']]
+    .forEach(([h, t], i) => { g.fillStyle = '#7B6B5F'; spaced(g, h, bx, 860 + i * 170, 10, 'left'); g.fillStyle = '#4A3B32'; g.fillText(t, bx, 925 + i * 170); });
+  // barcode area
+  g.fillStyle = '#FFFFFF'; g.fillRect(P + P - 760, 760, 560, 360);
+  g.strokeStyle = '#B9A893'; g.lineWidth = 3; g.strokeRect(P + P - 760, 760, 560, 360);
+  g.fillStyle = '#9C8B7C'; g.font = `500 40px ${SANS}`; g.textAlign = 'center'; g.fillText('barcode', P + P - 480, 950);
+  g.fillStyle = 'rgba(255,240,232,0.9)'; g.font = `500 46px ${SANS}`; g.textAlign = 'left';
+  spaced(g, 'SHAKE WELL · SERVE CHILLED', bx, split + 230, 12, 'left');
+  g.font = `500 42px ${SANS}`; g.fillText('Produced in Azerbaijan · 500 ml', bx, H - 120);
+  return c;
+}
+
+// neck collar: thin off-white ring with gold rules and the star mark at the front
+function collarCanvas() {
+  const W = 2048, H = 192;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.fillStyle = '#F7F1E7'; g.fillRect(0, 0, W, H);
+  g.fillStyle = BRAND.gold; g.fillRect(0, 22, W, 5); g.fillRect(0, H - 27, W, 5);
+  starMark(g, W * 0.25, H / 2, 48, BRAND.redAccent, '#F7F1E7');
+  g.fillStyle = '#6E5D51'; g.font = `500 30px ${SANS}`;
+  spaced(g, 'SHİRƏ', W * 0.75, H / 2 + 11, 10);
+  return c;
+}
+
+// warm studio wall with soft out-of-focus shelf bottles
+function wallCanvas() {
+  const c = document.createElement('canvas'); c.width = 2048; c.height = 1024;
+  const g = c.getContext('2d');
+  const grd = g.createLinearGradient(0, 0, 0, 1024);
+  grd.addColorStop(0, '#CDB79C'); grd.addColorStop(0.55, '#E3D2BC'); grd.addColorStop(1, '#C9B092');
+  g.fillStyle = grd; g.fillRect(0, 0, 2048, 1024);
+  const glow = g.createRadialGradient(1024, 420, 40, 1024, 420, 900);
+  glow.addColorStop(0, 'rgba(255,246,230,0.7)'); glow.addColorStop(1, 'rgba(255,246,230,0)');
+  g.fillStyle = glow; g.fillRect(0, 0, 2048, 1024);
+  g.filter = 'blur(26px)';
+  [[260, '#8E2A2A'], [430, '#C9852E'], [1620, '#5A1E3E'], [1790, '#B8662A']].forEach(([x, col]) => {
+    g.fillStyle = col; g.globalAlpha = 0.55;
+    g.beginPath(); g.roundRect(x - 55, 380, 110, 520, 40); g.fill();
+    g.fillRect(x - 22, 170, 44, 230);
+    g.fillStyle = '#EDE3D2'; g.globalAlpha = 0.6; g.fillRect(x - 56, 660, 112, 170);
+  });
+  g.globalAlpha = 1; g.filter = 'none';
+  return c;
+}
+
+function woodCanvas() {
+  const c = document.createElement('canvas'); c.width = 2048; c.height = 1024;
+  const g = c.getContext('2d');
+  g.fillStyle = '#8A5A33'; g.fillRect(0, 0, 2048, 1024);
+  let seed = 9; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let y = 0; y < 1024; y += 2) {
+    const v = Math.sin(y * 0.03) * 0.5 + Math.sin(y * 0.011 + 2) * 0.35 + Math.sin(y * 0.17) * 0.15;
+    const l = 0.86 + v * 0.14;
+    g.fillStyle = `rgba(${168 * l | 0},${112 * l | 0},${66 * l | 0},0.6)`; g.fillRect(0, y, 2048, 2);
+  }
+  for (let i = 0; i < 1600; i++) {
+    g.strokeStyle = `rgba(70,40,18,${0.04 + rnd() * 0.1})`; g.lineWidth = 0.6 + rnd() * 1.6;
+    const y = rnd() * 1024, x = rnd() * 2048, len = 120 + rnd() * 600;
+    g.beginPath(); g.moveTo(x, y); g.bezierCurveTo(x + len * 0.3, y + rnd() * 5 - 2.5, x + len * 0.6, y + rnd() * 5 - 2.5, x + len, y + rnd() * 3 - 1.5); g.stroke();
+  }
+  return c;
+}
+
+// ---------------------------------------------------------------- scene
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+} catch (e) {
+  statusEl.textContent = 'This mockup needs WebGL, which is turned off or unavailable in this browser.';
+  throw e;
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.02;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;
+stage.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
+scene.environmentIntensity = 0.65;
+
+const camera = new THREE.PerspectiveCamera(24, 1, 0.5, 500);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 13.2, 0);
+controls.enablePan = false; controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 40; controls.maxDistance = 125;
+controls.minPolarAngle = 1.2; controls.maxPolarAngle = 1.66;
+camera.position.set(0, 15.5, 80);
+
+const tex = (canvas, srgb = true) => { const t = new THREE.CanvasTexture(canvas); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t; };
+
+// backdrop wall and wooden shelf
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(220, 110), new THREE.MeshBasicMaterial({ map: tex(wallCanvas()), toneMapped: false }));
+wall.position.set(0, 34, -60); scene.add(wall);
+const woodMap = tex(woodCanvas()); woodMap.wrapS = woodMap.wrapT = THREE.RepeatWrapping; woodMap.repeat.set(1.6, 0.8);
+const woodMat = new THREE.MeshPhysicalMaterial({ map: woodMap, roughness: 0.5, clearcoat: 0.45, clearcoatRoughness: 0.3 });
+const shelf = new THREE.Mesh(new THREE.BoxGeometry(160, 2.4, 44), woodMat);
+shelf.position.set(0, -1.2, -10); shelf.receiveShadow = true; scene.add(shelf);
+
+// ---------------------------------------------------------------- bottle
+// 500 ml longneck profile in cm: [radius, height]
+const PROFILE = [[0, 0], [2.85, 0], [3.18, 0.18], [3.3, 0.6], [3.3, 11.6], [3.24, 12.9], [3.02, 14.8], [2.62, 16.9],
+  [2.12, 18.8], [1.7, 20.4], [1.44, 21.8], [1.36, 23.2], [1.34, 24.6], [1.48, 24.75], [1.5, 25.15], [1.38, 25.3]];
+const pts = (list, n = 240) => new THREE.SplineCurve(list.map(([r, y]) => new THREE.Vector2(r, y))).getPoints(n);
+const FILL = 21.9;
+
+const bottle = new THREE.Group(); scene.add(bottle);
+
+// liquid: transmissive volume with deep berry absorption
+const juicePts = PROFILE.filter(([, y]) => y <= FILL).map(([r, y]) => [r ? r - 0.28 : 0, r ? y : 0.55]);
+juicePts.push([juicePts[juicePts.length - 1][0], FILL], [0, FILL]);
+const juiceMat = new THREE.MeshPhysicalMaterial({
+  color: '#ffffff', roughness: 0.03, transmission: 1, thickness: 6.4, ior: 1.34,
+  attenuationColor: new THREE.Color('#A3102E'), attenuationDistance: 2.4, envMapIntensity: 0.7, specularIntensity: 0.8,
+});
+const liquid = new THREE.Mesh(new THREE.LatheGeometry(pts(juicePts), 192), juiceMat);
+liquid.castShadow = true; bottle.add(liquid);
+
+// glass: additive reflective shell over the juice + transmissive empty neck and thick base
+const shellMat = new THREE.MeshPhysicalMaterial({
+  color: '#000000', roughness: 0.02, clearcoat: 1, clearcoatRoughness: 0.01, envMapIntensity: 1.5,
+  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+});
+bottle.add(new THREE.Mesh(new THREE.LatheGeometry(pts(PROFILE), 192), shellMat));
+const clearGlass = new THREE.MeshPhysicalMaterial({
+  color: '#ffffff', roughness: 0.02, transmission: 1, thickness: 0.3, ior: 1.52,
+  attenuationColor: new THREE.Color('#E2EFE6'), attenuationDistance: 1.6, envMapIntensity: 1.5, clearcoat: 1,
+});
+const neckPts = PROFILE.filter(([r, y]) => y >= FILL - 0.3 && r > 0);
+bottle.add(new THREE.Mesh(new THREE.LatheGeometry(pts(neckPts, 80), 192), clearGlass));
+const base = new THREE.Mesh(new THREE.CylinderGeometry(3.08, 2.86, 0.55, 128), clearGlass);
+base.position.y = 0.28; bottle.add(base);
+
+// body label: 190 mm wrapped around a 33 mm radius bottle, front panel centred
+const labelMap = tex(bodyLabelCanvas());
+const ARC = 19.0 / 3.3, LH = 9.5;
+const label = new THREE.Mesh(new THREE.CylinderGeometry(3.32, 3.32, LH, 256, 1, true, -ARC * 0.25, ARC),
+  new THREE.MeshPhysicalMaterial({ map: labelMap, roughness: 0.72, envMapIntensity: 0.55 }));
+label.position.y = 1.7 + LH / 2; label.castShadow = true; bottle.add(label);
+
+// neck collar under the cap
+const collar = new THREE.Mesh(new THREE.CylinderGeometry(1.395, 1.4, 1.35, 192, 1, true),
+  new THREE.MeshPhysicalMaterial({ map: tex(collarCanvas()), roughness: 0.68 }));
+collar.position.y = 23.65; collar.rotation.y = -Math.PI / 2; bottle.add(collar);
+
+// metallic gold screw cap with fine vertical knurl
+const knurl = document.createElement('canvas'); knurl.width = 1024; knurl.height = 8;
+{ const g = knurl.getContext('2d'); for (let x = 0; x < 1024; x += 6) { const gr = g.createLinearGradient(x, 0, x + 6, 0); gr.addColorStop(0, '#444'); gr.addColorStop(0.5, '#fff'); gr.addColorStop(1, '#444'); g.fillStyle = gr; g.fillRect(x, 0, 6, 8); } }
+const knurlMap = tex(knurl, false);
+const goldMat = new THREE.MeshPhysicalMaterial({ color: '#C9A257', metalness: 1, roughness: 0.26, bumpMap: knurlMap, bumpScale: 0.5, clearcoat: 0.7, clearcoatRoughness: 0.15 });
+const goldTop = new THREE.MeshPhysicalMaterial({ color: '#C9A257', metalness: 1, roughness: 0.2, clearcoat: 0.7 });
+const cap = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.63, 1.75, 192, 1, true), goldMat);
+cap.position.y = 25.4; cap.castShadow = true; bottle.add(cap);
+const capTop = new THREE.Mesh(new THREE.CylinderGeometry(1.52, 1.6, 0.14, 192), goldTop);
+capTop.position.y = 26.32; bottle.add(capTop);
+const capRing = new THREE.Mesh(new THREE.TorusGeometry(1.62, 0.07, 16, 192), goldTop);
+capRing.rotation.x = Math.PI / 2; capRing.position.y = 24.56; bottle.add(capRing);
+const sealRing = new THREE.Mesh(new THREE.TorusGeometry(1.5, 0.05, 12, 192), goldTop);
+sealRing.rotation.x = Math.PI / 2; sealRing.position.y = 24.36; bottle.add(sealRing);
+
+// ---------------------------------------------------------------- lights
+const key = new THREE.DirectionalLight('#fff1de', 2.6);
+key.position.set(-26, 38, 30); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 10; key.shadow.blurSamples = 20; key.shadow.bias = -0.0004;
+Object.assign(key.shadow.camera, { left: -20, right: 20, top: 34, bottom: -6, near: 1, far: 120 });
+scene.add(key);
+const rim = new THREE.DirectionalLight('#ffd6a6', 2.4); rim.position.set(14, 26, -36); scene.add(rim);
+const fill = new THREE.DirectionalLight('#ffe9d2', 0.45); fill.position.set(30, 14, 26); scene.add(fill);
+scene.add(new THREE.HemisphereLight('#fff2e2', '#6b4a2e', 0.3));
+
+// ---------------------------------------------------------------- views
+const VIEWS = { front: 0, side: Math.PI / 2.2, back: Math.PI };
+let targetYaw = 0, spin = false;
+const buttons = { front: 'v-front', side: 'v-side', back: 'v-back' };
+function pick(name) {
+  spin = false; document.getElementById('v-spin').setAttribute('aria-pressed', 'false');
+  targetYaw = VIEWS[name];
+  for (const [k, id] of Object.entries(buttons)) document.getElementById(id).setAttribute('aria-pressed', String(k === name));
+  const d = camera.position.distanceTo(controls.target);
+  camera.position.set(controls.target.x, 15, controls.target.z + d);
+}
+for (const [k, id] of Object.entries(buttons)) document.getElementById(id).addEventListener('click', () => pick(k));
+document.getElementById('v-spin').addEventListener('click', (e) => {
+  spin = !spin; e.currentTarget.setAttribute('aria-pressed', String(spin));
+  for (const id of Object.values(buttons)) document.getElementById(id).setAttribute('aria-pressed', 'false');
+});
+
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.fov = w / h < 1 ? 26 : 22;
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stage);
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (spin && !reduceMotion) targetYaw += dt * 0.5;
+  bottle.rotation.y += (targetYaw - bottle.rotation.y) * Math.min(1, dt * 6);
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+
+await fontsReady();
+labelMap.image = bodyLabelCanvas(); labelMap.needsUpdate = true;
+collar.material.map.image = collarCanvas(); collar.material.map.needsUpdate = true;
+resize();
+statusEl.remove();
+document.getElementById('hint').hidden = false;
+window.READY = true;
+requestAnimationFrame(frame);
+</script>
