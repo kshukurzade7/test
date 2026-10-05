@@ -1,2 +1,4 @@
 __pycache__/
 shira-bottles/composite/view.html
+shira-bottles/photo/view.html
+shira-bottles/photo/grid.html
