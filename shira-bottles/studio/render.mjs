@@ -8,7 +8,7 @@ import { extname, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const dir = dirname(fileURLToPath(import.meta.url));
-const [w = 1600, h = 1200, out = 'shira-studio.png'] = process.argv.slice(2);
+const [w = 1600, h = 1200, out = 'shira-studio.png', sceneFile = 'scene.html', extra = ''] = process.argv.slice(2);
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png' };
 const server = createServer((req, res) => {
   try {
@@ -35,7 +35,7 @@ for (const key of ['apricot', 'pomegranate', 'grape']) {
 }
 
 await page.setViewportSize({ width: +w, height: +h });
-await page.goto(`http://localhost:8765/scene.html?w=${w}&h=${h}`, { waitUntil: 'commit', timeout: 300000 });
+await page.goto(`http://localhost:8765/${sceneFile}?w=${w}&h=${h}${extra}`, { waitUntil: 'commit', timeout: 300000 });
 await page.waitForFunction(() => window.READY, null, { timeout: 300000 });
 await page.waitForTimeout(500);
 await page.locator('#final').screenshot({ path: join(dir, out) });
