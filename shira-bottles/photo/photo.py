@@ -89,6 +89,27 @@ def emblem(c, r):
             f'<circle r="{r*0.3:.3f}" fill="{CREAM}"/>')
 
 
+def az_flag(w):
+    """Minimal flag of Azerbaijan, top-left at (0, 0), w wide (2:1): three flat
+    stripes, white crescent and eight-point star, softly rounded, hairline edge."""
+    h = w / 2
+    cx, cy = w * 0.47, h / 2
+    star = " ".join(
+        f"{w*0.565 + (h*0.075 if k % 2 == 0 else h*0.035) * math.cos(k * math.pi / 8 - math.pi / 2):.3f},"
+        f"{cy + (h*0.075 if k % 2 == 0 else h*0.035) * math.sin(k * math.pi / 8 - math.pi / 2):.3f}"
+        for k in range(16))
+    uid = f"azf{int(w * 100)}"
+    return (f'<clipPath id="{uid}"><rect width="{w}" height="{h:.3f}" rx="{h*0.14:.3f}"/></clipPath>'
+            f'<g clip-path="url(#{uid})">'
+            f'<rect width="{w}" height="{h/3:.3f}" fill="#00B5E2"/>'
+            f'<rect y="{h/3:.3f}" width="{w}" height="{h/3:.3f}" fill="#EF3340"/>'
+            f'<rect y="{2*h/3:.3f}" width="{w}" height="{h/3 + 0.01:.3f}" fill="#509E2F"/>'
+            f'<circle cx="{cx:.3f}" cy="{cy:.3f}" r="{h*0.15:.3f}" fill="#fff"/>'
+            f'<circle cx="{cx + h*0.04:.3f}" cy="{cy:.3f}" r="{h*0.125:.3f}" fill="#EF3340"/>'
+            f'<polygon points="{star}" fill="#fff"/></g>'
+            f'<rect width="{w}" height="{h:.3f}" rx="{h*0.14:.3f}" fill="none" stroke="#F6EFE3" stroke-width="{h*0.05:.3f}" stroke-opacity="0.85"/>')
+
+
 def flat_label(f, fw, fh):
     """Flat SHIRÁ label artwork, fw x fh units."""
     cx = fw / 2
@@ -107,8 +128,8 @@ def flat_label(f, fw, fh):
   <line x1="{cx-6}" y1="{fh*0.335:.2f}" x2="{cx+6}" y2="{fh*0.335:.2f}" stroke="#C9A35A" stroke-width="0.35"/>
   <text x="{cx}" y="{fh*0.44:.2f}" text-anchor="middle" font-family="{SERIF}" font-style="italic" font-size="{8 if len(f['name']) < 9 else 7}" fill="{f['accent']}">{f['name']}</text>
   <text x="{cx}" y="{fh*0.505:.2f}" text-anchor="middle" font-family="{SANS}" font-size="2.5" letter-spacing="0.7" fill="#6b5a4e">100% NATURAL JUICE</text>
-  <text x="{fw*0.12:.2f}" y="{band_y + bh*0.27:.2f}" font-family="{SERIF}" font-style="italic" font-size="5.5" fill="{CREAM}">{f['local']}</text>
-  <text x="{fw*0.12:.2f}" y="{fh - 3.6:.2f}" font-family="{SANS}" font-size="2.2" letter-spacing="0.5" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>
+  <g transform="translate({fw*0.12:.2f} {fh - 6.2:.2f})">{az_flag(5.2)}</g>
+  <text x="{fw*0.12 + 6.8:.2f}" y="{fh - 3.6:.2f}" font-family="{SANS}" font-size="2.2" letter-spacing="0.5" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>
   <text x="{fw*0.88:.2f}" y="{fh - 3.6:.2f}" text-anchor="end" font-family="{SANS}" font-size="2.8" fill="{CREAM}">500 ml</text>
 </g>"""
 

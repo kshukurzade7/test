@@ -18,7 +18,7 @@ HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE.parent / "composite"))
 sys.path.insert(0, str(HERE.parent / "photo"))
 from hero import HERO  # noqa: E402
-from photo import embedded_fonts, emblem  # noqa: E402
+from photo import embedded_fonts, emblem, az_flag  # noqa: E402
 
 TRIM_W, TRIM_H, BLEED, SAFE = 190, 95, 3, 3
 FRONT_W = 95
@@ -31,17 +31,14 @@ BODY = "#4A3B32"
 GOLD = "#B8934A"
 
 FLAVORS = [
-    dict(key="apricot", name="Apricot", local="Ərik", band="#E8892E", accent="#D96A12",
+    dict(key="apricot", name="Apricot", band="#E8892E", accent="#D96A12",
          story="Sun-ripened apricots from the orchards of Azerbaijan, pressed and bottled. Nothing added, nothing taken away.",
-         story_az="Azərbaycan bağlarında yetişmiş ərikdən hazırlanmış 100% təbii şirə.",
          ingredients="Apricot juice (100%)."),
-    dict(key="pomegranate", name="Pomegranate", local="Nar", band="#A82334", accent="#A8172C",
+    dict(key="pomegranate", name="Pomegranate", band="#A82334", accent="#A8172C",
          story="Ruby pomegranates from Azerbaijan, gently pressed for a deep, tart juice. Nothing added, nothing taken away.",
-         story_az="Azərbaycan narından sıxılmış 100% təbii şirə.",
          ingredients="Pomegranate juice (100%)."),
-    dict(key="grape", name="Grape", local="Üzüm", band="#573259", accent="#5B2453",
+    dict(key="grape", name="Grape", band="#573259", accent="#5B2453",
          story="Dark grapes from Azerbaijan's sunlit vineyards, pressed into a rich, rounded juice. Nothing added, nothing taken away.",
-         story_az="Azərbaycan üzüm bağlarından 100% təbii şirə.",
          ingredients="Grape juice (100%)."),
 ]
 
@@ -76,8 +73,8 @@ def front(f):
 <line x1="{cx - 7}" y1="34" x2="{cx + 7}" y2="34" stroke="{GOLD}" stroke-width="0.35"/>
 <text x="{cx}" y="43" text-anchor="middle" font-family="{SERIF}" font-style="italic" font-size="{9 if len(f['name']) < 9 else 8}" fill="{f['accent']}">{f['name']}</text>
 <text x="{cx}" y="49.3" text-anchor="middle" font-family="{SANS}" font-size="2.0" letter-spacing="0.5" fill="#6B5A4E">100% NATURAL JUICE · NOT FROM CONCENTRATE</text>
-<text x="9" y="66" font-family="{SERIF}" font-style="italic" font-size="6.5" fill="{CREAM}">{f['local']}</text>
-<text x="9" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>
+<g transform="translate(9 84.9)">{az_flag(7)}</g>
+<text x="18.4" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>
 <text x="{FRONT_W - 8}" y="88.6" text-anchor="end" font-family="{SANS}" font-weight="500" font-size="6" fill="{CREAM}">500 ml</text>"""
 
 
@@ -104,7 +101,6 @@ def back(f):
     story = wrap(f["story"], 66)
     out.append(text_lines(story, x0, y, 2.9, 3.6, font_family=SERIF, font_style="italic", fill=BODY))
     y += len(story) * 3.6
-    out.append(text_lines(wrap(f["story_az"], 72), x0, y + 0.4, 2.6, 3.2, font_family=SERIF, font_style="italic", fill="#7A6A5E"))
     top = y + 6.5
     out.append(f'<line x1="{x0}" y1="{top - 2.6:.2f}" x2="{TRIM_W - 7}" y2="{top - 2.6:.2f}" stroke="#D8C9B6" stroke-width="0.2"/>')
 
