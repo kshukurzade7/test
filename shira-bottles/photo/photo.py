@@ -78,13 +78,15 @@ def smooth(vals, k):
 
 
 def emblem(c, r):
-    """SHIRÁ mark: a citrus-slice disc with eight segments and a light centre."""
-    spokes = "".join(
-        f'<line x1="0" y1="0" x2="{r*0.86*math.cos(a):.3f}" y2="{r*0.86*math.sin(a):.3f}" '
-        f'stroke="{CREAM}" stroke-width="{r*0.17:.3f}" stroke-linecap="round"/>'
-        for a in [k * math.pi / 4 + math.pi / 8 for k in range(8)])
-    return (f'<circle r="{r}" fill="{c}"/>{spokes}'
-            f'<circle r="{r*0.26:.3f}" fill="{CREAM}"/>')
+    """SHIRÁ mark: a citrus slice. Solid disc cut into eight segments by four
+    thin straight lines through the centre, with a small light centre."""
+    gap = r * 0.075
+    cuts = "".join(
+        f'<line x1="{-r*1.05*math.cos(a):.3f}" y1="{-r*1.05*math.sin(a):.3f}" '
+        f'x2="{r*1.05*math.cos(a):.3f}" y2="{r*1.05*math.sin(a):.3f}" stroke="{CREAM}" stroke-width="{gap:.3f}"/>'
+        for a in [k * math.pi / 4 for k in range(4)])
+    return (f'<circle r="{r}" fill="{c}"/>{cuts}'
+            f'<circle r="{r*0.3:.3f}" fill="{CREAM}"/>')
 
 
 def flat_label(f, fw, fh):

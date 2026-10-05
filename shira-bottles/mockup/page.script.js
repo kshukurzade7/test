@@ -15,14 +15,15 @@ const FLAVOURS = [
 
 // SHIRÁ citrus mark: a disc with eight cream spokes and a cream centre
 function citrusMark(g, x, y, r, fill, cut) {
+  // citrus slice: solid disc, eight segments split by thin lines through the centre, light centre
   g.save(); g.translate(x, y);
   g.fillStyle = fill; g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.fill();
-  g.strokeStyle = cut; g.lineCap = 'round'; g.lineWidth = r * 0.17;
-  for (let k = 0; k < 8; k++) {
-    const a = k * Math.PI / 4 + Math.PI / 8;
-    g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a) * r * 0.86, Math.sin(a) * r * 0.86); g.stroke();
+  g.strokeStyle = cut; g.lineWidth = r * 0.075;
+  for (let k = 0; k < 4; k++) {
+    const a = k * Math.PI / 4;
+    g.beginPath(); g.moveTo(-Math.cos(a) * r * 1.05, -Math.sin(a) * r * 1.05); g.lineTo(Math.cos(a) * r * 1.05, Math.sin(a) * r * 1.05); g.stroke();
   }
-  g.fillStyle = cut; g.beginPath(); g.arc(0, 0, r * 0.26, 0, Math.PI * 2); g.fill();
+  g.fillStyle = cut; g.beginPath(); g.arc(0, 0, r * 0.3, 0, Math.PI * 2); g.fill();
   g.restore();
 }
 
