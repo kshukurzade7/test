@@ -143,10 +143,12 @@ function bottle({ label, juice, density, cloudy = 0, x, z, rotY = 0, fill = 22.6
 
   // paper label on the lower body
   const tex = loader.load(label); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 16;
-  const arc = 2.3, h = 8.4;
-  const lab = new THREE.Mesh(new THREE.CylinderGeometry(3.318, 3.318, h, 160, 1, true, -arc / 2, arc),
+  // print label: 190 x 95 mm trim (+3 mm bleed in the texture), wraps 190 of 207 mm
+  tex.repeat.set(190 / 196, 95 / 101); tex.offset.set(3 / 196, 3 / 101);
+  const arc = 19.0 / 3.3, h = 9.5; // 190 mm of label around a 33 mm radius
+  const lab = new THREE.Mesh(new THREE.CylinderGeometry(3.318, 3.318, h, 200, 1, true, -arc * 0.25, arc),
     new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.62, clearcoat: 0.1, clearcoatRoughness: 0.5 }));
-  lab.position.y = 2.2 + h / 2; lab.castShadow = true; g.add(lab);
+  lab.position.y = 1.7 + h / 2; lab.castShadow = true; g.add(lab);
 
   // short ribbed champagne-gold cap
   const capH = 1.55;
@@ -162,12 +164,12 @@ function bottle({ label, juice, density, cloudy = 0, x, z, rotY = 0, fill = 22.6
 
 const SET = q.get('set') || 'trio';
 if (SET === 'trio') {
-  bottle({ label: 'textures/apricot.png', juice: '#E2780F', density: 0.55, cloudy: 0.55, x: -7.4, z: 0.6, rotY: 0.1 });
-  bottle({ label: 'textures/pomegranate.png', juice: '#C0102C', density: 2.6, x: 0, z: -0.6, rotY: 0 });
-  bottle({ label: 'textures/grape.png', juice: '#6E1A66', density: 3.2, x: 7.4, z: 0.6, rotY: -0.1 });
+  bottle({ label: 'textures/apricot-wrap.png', juice: '#E2780F', density: 0.55, cloudy: 0.55, x: -7.4, z: 0.6, rotY: 0.1 });
+  bottle({ label: 'textures/pomegranate-wrap.png', juice: '#C0102C', density: 2.6, x: 0, z: -0.6, rotY: 0 });
+  bottle({ label: 'textures/grape-wrap.png', juice: '#6E1A66', density: 3.2, x: 7.4, z: 0.6, rotY: -0.1 });
   // out-of-focus bottles behind, like a shop shelf
-  bottle({ label: 'textures/pomegranate.png', juice: '#C0102C', density: 2.6, x: -15, z: -30, rotY: 0.3 });
-  bottle({ label: 'textures/apricot.png', juice: '#E2780F', density: 0.55, cloudy: 0.55, x: 16, z: -32, rotY: -0.3 });
+  bottle({ label: 'textures/pomegranate-wrap.png', juice: '#C0102C', density: 2.6, x: -15, z: -30, rotY: 2.6 });
+  bottle({ label: 'textures/apricot-wrap.png', juice: '#E2780F', density: 0.55, cloudy: 0.55, x: 16, z: -32, rotY: -2.4 });
 }
 
 // ------------------------------------------------------------ lights

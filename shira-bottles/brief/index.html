@@ -1,0 +1,240 @@
+<title>SHIRÁ Packaging Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600&display=swap">
+<style>
+/* Layout: a single reading column, like a printed spec sheet; wide tables scroll in place. */
+:root {
+  --bg: #F6EFE3; --paper: #FBF7F0; --fg: #3A2A22; --muted: #7A6A5E; --rule: #DCCBB6;
+  --gold: #A9833C; --tbc-bg: #F3E2C4; --tbc-fg: #7A4E12;
+  --apricot: #D96A12; --pomegranate: #A8172C; --grape: #5B2453;
+  --display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --body: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1F1915; --paper: #29211C; --fg: #EFE5D6; --muted: #B5A595; --rule: #4A3D33;
+  --gold: #D2AE68; --tbc-bg: #4A3720; --tbc-fg: #F2D19A;
+  --apricot: #F0974A; --pomegranate: #E3566A; --grape: #B98AB1; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #1F1915; --paper: #29211C; --fg: #EFE5D6; --muted: #B5A595; --rule: #4A3D33;
+  --gold: #D2AE68; --tbc-bg: #4A3720; --tbc-fg: #F2D19A;
+  --apricot: #F0974A; --pomegranate: #E3566A; --grape: #B98AB1; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 400 15px/1.65 var(--body); padding-inline: 20px; padding-block: 0 64px }
+.wrap { max-width: 860px; margin: 0 auto }
+header { padding-block: 56px 32px; border-bottom: 1px solid var(--rule); display: grid; gap: 10px }
+.eyebrow { font: 500 11px/1 var(--body); letter-spacing: .22em; text-transform: uppercase; color: var(--gold) }
+h1 { font: 500 clamp(40px, 7vw, 64px)/1.02 var(--display); letter-spacing: .06em; margin: 0; text-wrap: balance }
+.lede { font: italic 500 21px/1.45 var(--display); color: var(--muted); margin: 0; max-width: 62ch }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 12.5px; color: var(--muted) }
+.meta b { color: var(--fg); font-weight: 600 }
+figure { margin: 0 }
+.hero { margin-block: 32px 8px }
+.hero img { width: 100%; display: block; border-radius: 4px }
+figcaption { font-size: 12.5px; color: var(--muted); margin-top: 8px }
+section { padding-block: 40px 8px; border-bottom: 1px solid var(--rule) }
+section:last-of-type { border-bottom: 0 }
+h2 { font: 600 30px/1.15 var(--display); margin: 0 0 6px; text-wrap: balance; display: flex; gap: 14px; align-items: baseline }
+h2 .n { font: 500 12px/1 var(--body); letter-spacing: .14em; color: var(--gold) }
+h3 { font: 600 11.5px/1.3 var(--body); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 26px 0 8px }
+p { margin: 0 0 12px; max-width: 68ch }
+ul { margin: 0 0 12px; padding-left: 20px; max-width: 70ch }
+li { margin-bottom: 5px }
+.statement { font: 500 22px/1.5 var(--display); border-left: 2px solid var(--gold); padding-left: 18px; margin-top: 14px }
+.tbc { background: var(--tbc-bg); color: var(--tbc-fg); font: 600 10.5px/1 var(--body); letter-spacing: .1em; padding: 3px 6px; border-radius: 3px; white-space: nowrap; vertical-align: 1px }
+.table { overflow-x: auto; margin-block: 8px 14px }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 13.5px; font-variant-numeric: tabular-nums }
+th, td { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--rule); vertical-align: top }
+th { font: 600 11px/1.3 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted) }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; border: 1px solid rgba(0,0,0,.12) }
+.labels { display: grid; gap: 18px; margin-top: 14px }
+.labels img { width: 100%; display: block; border-radius: 3px; background: #fff }
+.flav { font: italic 500 18px/1 var(--display) }
+.checks { list-style: none; padding: 0; display: grid; gap: 6px }
+.checks li::before { content: "✓"; color: var(--gold); font-weight: 600; margin-right: 10px }
+.checks li.no::before { content: "–"; color: var(--muted) }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0 32px }
+.cols > div { min-width: 0 }
+.warn { background: var(--paper); border: 1px solid var(--rule); padding: 14px 16px; border-radius: 4px; font-size: 14px }
+.warn b { color: var(--pomegranate) }
+code { font-size: 12.5px; background: var(--paper); padding: 1px 5px; border-radius: 3px }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Packaging design brief · v1</div>
+    <h1>SHIRÁ</h1>
+    <p class="lede">100% natural fruit juice from Azerbaijan, in a 500 ml clear glass longneck with a wrap-around label. Three launch flavours: Apricot, Pomegranate, Grape.</p>
+    <div class="meta">
+      <span><b>For</b> label designer, printer, bottle &amp; cap suppliers</span>
+      <span><b>Status</b> draft for review</span>
+      <span><span class="tbc">TBC</span> = to be confirmed by the brand owner</span>
+    </div>
+  </header>
+
+  <figure class="hero">
+    <img src="shira-longneck-label.png" alt="Three SHIRÁ 500 ml glass longneck bottles, Apricot, Pomegranate and Grape, with cream wrap labels and gold caps, two more bottles out of focus behind.">
+    <figcaption>3D visual of the intended finished pack. Not a photograph; final glass, cap and print will differ slightly.</figcaption>
+  </figure>
+
+  <section id="strategy">
+    <h2><span class="n">01</span>Packaging strategy</h2>
+    <p class="statement">SHIRÁ should look like a small Azerbaijani juice house, not a supermarket juice. On the shelf, a calm cream label, one confident colour per fruit and a gold cap make it the bottle you would put on a dinner table. On opening, the twist of the gold cap and the true colour of the juice through clear glass confirm it is real fruit. The single impression: pure fruit from Azerbaijan, handled with care.</p>
+  </section>
+
+  <section id="structure">
+    <h2><span class="n">02</span>Structure</h2>
+    <h3>Primary pack</h3>
+    <ul>
+      <li><b>Bottle:</b> 500 ml clear (flint) glass longneck, straight cylindrical body, long gentle shoulder, narrow neck. Approx. Ø 66 mm × 265 mm. <span class="tbc">TBC</span> exact supplier drawing.</li>
+      <li><b>Closure:</b> metal twist-off cap with tamper-evident band, finished in champagne-gold lacquer, fine vertical knurl. Optional: SHIRÁ emblem embossed or printed on the top. <span class="tbc">TBC</span> neck finish (e.g. 28 mm ROPP or twist-off lug) to match the bottle.</li>
+      <li><b>Fill:</b> juice fills well into the neck so the colour reads from top to bottom.</li>
+      <li><b>Label:</b> one wrap-around paper label, 190 × 95 mm, applied with its base about 17 mm above the bottle base. It leaves a ~17 mm gap at the back.</li>
+    </ul>
+    <h3>Secondary pack</h3>
+    <ul>
+      <li>Shipping carton for 12 bottles (3 × 4) in kraft corrugated board with cardboard dividers, one-colour print: SHIRÁ wordmark, flavour, quantity. <span class="tbc">TBC</span> 6 or 12 per case.</li>
+      <li>Optional gift box for 3 bottles (one of each flavour). <span class="tbc">TBC</span> whether this is in the launch.</li>
+    </ul>
+  </section>
+
+  <section id="identity">
+    <h2><span class="n">03</span>Visual identity on the pack</h2>
+    <div class="cols">
+      <div>
+        <h3>Logo</h3>
+        <ul>
+          <li>Front panel, centred, upper third: emblem (Ø 10.4 mm) above the SHIRÁ wordmark.</li>
+          <li>Wordmark minimum width on any pack: 25 mm.</li>
+          <li>Wordmark in Ink on Cream. On a dark background use Cream; never put it on the coloured band.</li>
+          <li>The emblem always takes the flavour colour on labels and gold on the cap.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Typography</h3>
+        <ul>
+          <li><b>Wordmark &amp; flavour name:</b> Cormorant Garamond Medium and Medium Italic.</li>
+          <li><b>All information text:</b> Montserrat Regular / Medium.</li>
+          <li>Back-panel body text 2.4 mm type size; lowercase letters must stay at least 1.2 mm tall (see section 09).</li>
+          <li>Both fonts are free (SIL Open Font License).</li>
+        </ul>
+      </div>
+    </div>
+    <h3>Colour</h3>
+    <div class="table"><table>
+      <thead><tr><th>Role</th><th>Hex (screen)</th><th>Where</th><th>Print match</th></tr></thead>
+      <tbody>
+        <tr><td><span class="sw" style="background:#F6EFE3"></span>Cream</td><td>#F6EFE3</td><td>Label ground</td><td><span class="tbc">TBC</span> by printer</td></tr>
+        <tr><td><span class="sw" style="background:#3A2A22"></span>Ink</td><td>#3A2A22</td><td>Wordmark, body text</td><td><span class="tbc">TBC</span></td></tr>
+        <tr><td><span class="sw" style="background:#B8934A"></span>Gold</td><td>#B8934A</td><td>Rule under wordmark; cap</td><td>Gold foil recommended</td></tr>
+        <tr><td><span class="sw" style="background:#E8892E"></span>Apricot band</td><td>#E8892E / accent #D96A12</td><td>Band, emblem, flavour name</td><td><span class="tbc">TBC</span></td></tr>
+        <tr><td><span class="sw" style="background:#A82334"></span>Pomegranate band</td><td>#A82334 / accent #A8172C</td><td>Band, emblem, flavour name</td><td><span class="tbc">TBC</span></td></tr>
+        <tr><td><span class="sw" style="background:#573259"></span>Grape band</td><td>#573259 / accent #5B2453</td><td>Band, emblem, flavour name</td><td><span class="tbc">TBC</span></td></tr>
+      </tbody>
+    </table></div>
+    <h3>Graphics</h3>
+    <ul>
+      <li>Each band carries a large tone-on-tone cross-section of its fruit, cropped by the label edges: halved apricot with stone, cut pomegranate with seeds, grape bunch with vine leaf. It is the same flat, geometric style as the emblem.</li>
+      <li>No photography and no green "natural" leaves. The fruit illustration is the only image.</li>
+    </ul>
+  </section>
+
+  <section id="hierarchy">
+    <h2><span class="n">04</span>Information on each panel</h2>
+    <div class="cols">
+      <div>
+        <h3>Front panel (95 mm)</h3>
+        <ol>
+          <li>SHIRÁ emblem and wordmark</li>
+          <li>Flavour name (e.g. <span class="flav" style="color:var(--pomegranate)">Pomegranate</span>)</li>
+          <li>100% NATURAL JUICE · NOT FROM CONCENTRATE</li>
+          <li>Fruit illustration on the colour band</li>
+          <li>Local name (Ərik, Nar, Üzüm)</li>
+          <li>500 ml and PRODUCT OF AZERBAIJAN</li>
+        </ol>
+      </div>
+      <div>
+        <h3>Back panel (95 mm)</h3>
+        <ol>
+          <li>SHIRÁ wordmark and "[Flavour] juice"</li>
+          <li>Two-line story in English, one line in Azerbaijani</li>
+          <li>Ingredients, storage, recycling</li>
+          <li>Nutrition per 100 ml <span class="tbc">TBC</span> lab values</li>
+          <li>EAN-13 barcode area (31 × 21 mm)</li>
+          <li>Best before / lot reference, producer name and address <span class="tbc">TBC</span></li>
+        </ol>
+      </div>
+    </div>
+    <p>Best-before date and lot number are printed on the cap (inkjet), so one label print run works for every batch.</p>
+  </section>
+
+  <section id="artwork">
+    <h2><span class="n">05</span>Label artwork</h2>
+    <p>Print-ready drafts at full size: 190 × 95 mm trim, 3 mm bleed, 3 mm safe zone, front and back separated by a fold guide. The magenta lines show the trim (solid) and safe zone (dashed) and are not printed. The files are SVG with the fonts embedded: <code>shira-bottles/label/shira-&lt;flavour&gt;-label.svg</code>.</p>
+    <div class="labels">
+      <figure><img src="preview-apricot.png" alt="Apricot wrap label, front and back."><figcaption>Apricot</figcaption></figure>
+      <figure><img src="preview-pomegranate.png" alt="Pomegranate wrap label, front and back."><figcaption>Pomegranate</figcaption></figure>
+      <figure><img src="preview-grape.png" alt="Grape wrap label, front and back."><figcaption>Grape</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="materials">
+    <h2><span class="n">06</span>Materials and finishes</h2>
+    <ul class="checks">
+      <li>Glass: clear flint, 100% recyclable</li>
+      <li>Label stock: textured uncoated wet-strength paper (wine-label type), cream or white, which survives fridge condensation and ice buckets</li>
+      <li>Hot gold foil on the rule under SHIRÁ and on the emblem on the front</li>
+      <li>Light blind emboss on the SHIRÁ wordmark (optional, tactile premium cue)</li>
+      <li class="no">No gloss lamination. It would cheapen the paper feel.</li>
+      <li class="no">No shrink sleeve or plastic label</li>
+    </ul>
+    <p><b>Application:</b> pressure-sensitive (self-adhesive) label on a reel. <span class="tbc">TBC</span> reel core size and unwind direction with the bottling line.</p>
+  </section>
+
+  <section id="unboxing">
+    <h2><span class="n">07</span>Unboxing and gifting</h2>
+    <p>The main sale is the shelf, so the bottle has to do the work alone. For the optional gift box and for online orders:</p>
+    <ul>
+      <li><b>Outer box:</b> plain kraft with a cream SHIRÁ sticker seal. It signals care without excess packaging.</li>
+      <li><b>Opening:</b> three bottles standing in a die-cut cardboard insert, one of each colour, labels facing up.</li>
+      <li><b>Extras:</b> one small card with the story of the three fruits and a QR code to the website <span class="tbc">TBC</span>.</li>
+      <li><b>After:</b> the clear bottles are worth keeping and refilling.</li>
+    </ul>
+  </section>
+
+  <section id="competition">
+    <h2><span class="n">08</span>Standing out</h2>
+    <p>Local glass-bottle juices on the shelf share one look: white labels, big green leaf logos, photo-style fruit, many small claims and certification badges, and plain silver caps. That reads as healthy but generic.</p>
+    <ul>
+      <li><b>Avoid:</b> green leaves, bright white, fruit photography, many badges, crowded front panels.</li>
+      <li><b>Do instead:</b> warm cream paper, one bold colour band, a single large fruit cross-section, generous empty space, and a gold cap. From across the aisle the three colours (orange, red, purple) should read as a set.</li>
+    </ul>
+  </section>
+
+  <section id="sku">
+    <h2><span class="n">09</span>Flavour system</h2>
+    <div class="cols">
+      <div>
+        <h3>Same on every flavour</h3>
+        <ul><li>Bottle, cap, label size and layout</li><li>Cream ground, SHIRÁ wordmark, fonts</li><li>Position of every text block</li></ul>
+      </div>
+      <div>
+        <h3>Changes per flavour</h3>
+        <ul><li>Band and accent colour</li><li>Fruit cross-section illustration</li><li>Flavour name, local name, story, ingredients, nutrition, barcode</li></ul>
+      </div>
+    </div>
+    <p>New flavours (e.g. Quince, Cherry, Sea-buckthorn) only need a new colour and a new illustration in the same style.</p>
+  </section>
+
+  <section id="technical">
+    <h2><span class="n">10</span>Technical requirements</h2>
+    <ul>
+      <li><b>Barcode:</b> EAN-13 from GS1 Azerbaijan, black bars on white, at least 80% magnification (≈ 31 × 21 mm incl. quiet zones), bars vertical when the bottle stands. <span class="tbc">TBC</span> numbers.</li>
+      <li><b>Text size:</b> lowercase letters at least 1.2 mm tall (EU Regulation 1169/2011 rule for packs over 80 cm²; a good standard for export). The "500 ml" figures at least 4 mm tall. The current artwork meets both.</li>
+      <li><b>Files:</b> deliver as PDF/X-4 with fonts outlined or embedded, CMYK + foil as a separate spot layer, dieline on its own non-printing layer.</li>
+      <li><b>Colour:</b> printer to match the hex values to CMYK or Pantone and supply a printed proof on the chosen paper before the run.</li>
+      <li><b>Dieline:</b> confirm 190 × 95 mm and corner radius with the label printer against the real bottle.</li>
+    </ul>
+    <div class="warn"><b>Before printing, confirm with a food-labelling specialist:</b> the required languages and wording for Azerbaijan and any export markets (Azerbaijani text may be required for all mandatory information), the claims "100% natural", "not from concentrate" and "no added sugar", lab-tested nutrition values, the producer's legal name and address, and whether the ℮ estimated-quantity mark is needed.</div>
+  </section>
+</div>

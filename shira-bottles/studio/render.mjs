@@ -25,7 +25,7 @@ page.on('console', (m) => console.log('page:', m.text()));
 page.on('pageerror', (e) => console.log('error:', e.message));
 
 mkdirSync(join(dir, 'textures'), { recursive: true });
-for (const key of ['apricot', 'pomegranate', 'grape']) {
+for (const key of (process.env.SKIP_TEX ? [] : ['apricot', 'pomegranate', 'grape'])) {
   const svg = readFileSync(join(dir, '..', 'photo', 'flat', `${key}-label.svg`), 'utf8');
   await texPage.setViewportSize({ width: 1400, height: 1400 });
   await texPage.setContent(`<body style="margin:0">${svg}</body>`);
