@@ -1,0 +1,231 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>SHIRÁ studio render</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": { "three": "./three/build/three.module.js", "three/addons/": "./three/examples/jsm/" } }
+</script>
+<script type="module">
+// SHIRÁ product shot: three glass bottles with juice, gold caps and SHIRÁ
+// labels on a stone plinth in a warm studio sweep.
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const params = new URLSearchParams(location.search);
+const W = +params.get('w') || 1600, H = +params.get('h') || 1200;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H);
+renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.32;
+
+// ---------------------------------------------------------------- studio
+const BG = new THREE.Color('#CDAE89');
+scene.background = BG;
+const sweepMat = new THREE.MeshStandardMaterial({ color: '#D3B48E', roughness: 0.95 });
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), sweepMat);
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(400, 200), sweepMat);
+wall.position.set(0, 100, -60); wall.receiveShadow = true; scene.add(wall);
+
+// travertine-like plinths (canvas noise texture)
+function stoneTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 512;
+  const g = c.getContext('2d');
+  g.fillStyle = '#EFE4D3'; g.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 900; i++) {
+    g.fillStyle = `rgba(${150 + Math.random() * 60},${130 + Math.random() * 50},${100 + Math.random() * 40},${Math.random() * 0.12})`;
+    const y = Math.random() * 512;
+    g.fillRect(0, y, 512, Math.random() * 3);
+  }
+  for (let i = 0; i < 300; i++) {
+    g.fillStyle = `rgba(120,100,75,${Math.random() * 0.15})`;
+    g.beginPath(); g.ellipse(Math.random() * 512, Math.random() * 512, Math.random() * 4, Math.random() * 1.5, 0, 0, 7); g.fill();
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const stoneMat = new THREE.MeshStandardMaterial({ map: stoneTexture(), roughness: 0.82 });
+function plinth(w, h, d, x, z, y0 = 0) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), stoneMat);
+  m.position.set(x, y0 + h / 2, z); m.castShadow = m.receiveShadow = true; scene.add(m); return h;
+}
+
+// ---------------------------------------------------------------- bottle
+// Profile of a classic juice longneck (units ~ cm): [radius, height]
+const PROFILE = [
+  [0, 0.15], [2.9, 0.15], [3.25, 0.3], [3.45, 0.75], [3.5, 1.4], [3.5, 12.6],
+  [3.42, 13.6], [3.1, 15.0], [2.55, 16.6], [1.95, 18.2], [1.55, 19.6], [1.4, 21.0],
+  [1.38, 22.9], [1.52, 23.1], [1.55, 23.6], [1.45, 23.75],
+];
+const profilePts = (inset = 0, maxY = Infinity) => {
+  const pts = [];
+  for (const [r, y] of PROFILE) if (y <= maxY) pts.push(new THREE.Vector2(Math.max(0, r - (r > 0 ? inset : 0)), y + (r === 0 ? inset : 0)));
+  return pts;
+};
+// smooth the profile with a spline
+function lathe(points, segs = 128) {
+  const curve = new THREE.SplineCurve(points);
+  return new THREE.LatheGeometry(curve.getPoints(160), segs);
+}
+
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color: '#ffffff', metalness: 0, roughness: 0.03, transmission: 1, thickness: 0.35, ior: 1.5,
+  clearcoat: 1, clearcoatRoughness: 0.02, specularIntensity: 1, envMapIntensity: 1.4,
+  attenuationColor: new THREE.Color('#e9f3ec'), attenuationDistance: 6,
+});
+
+function capTexture() {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 64;
+  const g = c.getContext('2d');
+  for (let x = 0; x < 1024; x += 8) {
+    const grd = g.createLinearGradient(x, 0, x + 8, 0);
+    grd.addColorStop(0, '#808080'); grd.addColorStop(0.5, '#ffffff'); grd.addColorStop(1, '#808080');
+    g.fillStyle = grd; g.fillRect(x, 0, 8, 64);
+  }
+  const t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; return t;
+}
+const capBump = capTexture();
+const goldMat = new THREE.MeshPhysicalMaterial({ color: '#C9A04E', metalness: 1, roughness: 0.28, bumpMap: capBump, bumpScale: 0.6, clearcoat: 0.4 });
+const goldTopMat = new THREE.MeshPhysicalMaterial({ color: '#C9A04E', metalness: 1, roughness: 0.22 });
+
+const loader = new THREE.TextureLoader();
+function bottle({ label, juice, cloud, x, z, y = 0, rotY = 0 }) {
+  const g = new THREE.Group();
+
+  // juice: slightly inside the glass, filled into the neck
+  const juiceMat = new THREE.MeshPhysicalMaterial({
+    color: juice, roughness: 0.12, metalness: 0, transmission: 0,
+    emissive: new THREE.Color(juice), emissiveIntensity: cloud, clearcoat: 0.3,
+  });
+  const liquid = new THREE.Mesh(lathe(profilePts(0.16, 20.4).concat([new THREE.Vector2(0, 20.4)])), juiceMat);
+  liquid.castShadow = true; g.add(liquid);
+
+  const glass = new THREE.Mesh(lathe(profilePts(0)), glassMat);
+  g.add(glass);
+
+  // label: paper wrapped on the body (front 124 degrees)
+  const tex = loader.load(label); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  const arc = 2.16, h = 7.9;
+  const lab = new THREE.Mesh(
+    new THREE.CylinderGeometry(3.515, 3.515, h, 96, 1, true, -arc / 2, arc),
+    new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.55, clearcoat: 0.15, clearcoatRoughness: 0.4, side: THREE.FrontSide }));
+  lab.position.y = 3.0 + h / 2; lab.castShadow = true; g.add(lab);
+
+  // gold twist-off cap
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(1.62, 1.62, 1.75, 96, 1, true), goldMat);
+  cap.position.y = 23.55; g.add(cap);
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.62, 0.12, 96), goldTopMat);
+  top.position.y = 24.48; g.add(top);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.06, 12, 96), goldTopMat);
+  rim.rotation.x = Math.PI / 2; rim.position.y = 22.7; g.add(rim);
+  cap.castShadow = true;
+
+  g.position.set(x, y, z); g.rotation.y = rotY;
+  scene.add(g);
+}
+
+// ---------------------------------------------------------------- set
+const base = plinth(40, 2.6, 14, 0, 0);
+const riser = base + plinth(11, 4.2, 10, 0, -1.2, base);
+bottle({ label: 'textures/apricot.png', juice: '#C9530A', cloud: 0.05, x: -11.5, z: 2.6, y: base, rotY: 0.12 });
+bottle({ label: 'textures/pomegranate.png', juice: '#5E0614', cloud: 0.03, x: 0, z: -1.2, y: riser + 0, rotY: 0.0 });
+bottle({ label: 'textures/grape.png', juice: '#22051D', cloud: 0.02, x: 11.5, z: 2.6, y: base, rotY: -0.12 });
+
+// ---------------------------------------------------------------- fruit props
+function addMesh(geo, mat, x, y, z, sx = 1, sy = 1, sz = 1) {
+  const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz);
+  m.castShadow = m.receiveShadow = true; scene.add(m); return m;
+}
+function sutureBump() {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, 512, 256);
+  const grd = g.createLinearGradient(118, 0, 138, 0);
+  grd.addColorStop(0, '#fff'); grd.addColorStop(0.5, '#555'); grd.addColorStop(1, '#fff');
+  g.fillStyle = grd; g.fillRect(118, 0, 20, 256);
+  return new THREE.CanvasTexture(c);
+}
+const apricotMat = new THREE.MeshPhysicalMaterial({ bumpMap: sutureBump(), bumpScale: 2.5, color: '#E57A1E', roughness: 0.6, sheen: 1, sheenRoughness: 0.5, sheenColor: new THREE.Color('#FFC27A') });
+const blushMat = apricotMat.clone(); blushMat.color = new THREE.Color('#D9601A');
+const stemMat = new THREE.MeshStandardMaterial({ color: '#4A3420', roughness: 0.8 });
+addMesh(new THREE.SphereGeometry(1.75, 64, 48), apricotMat, -5.6, base + 1.6, 5.4, 1, 0.92, 1);
+addMesh(new THREE.SphereGeometry(1.6, 64, 48), blushMat, -18.2, base + 1.45, 4.6, 1, 0.92, 1);
+addMesh(new THREE.CylinderGeometry(0.06, 0.08, 0.5, 8), stemMat, -5.6, base + 3.3, 5.4);
+
+const pomMat = new THREE.MeshPhysicalMaterial({ color: '#8C1222', roughness: 0.38, clearcoat: 0.6, clearcoatRoughness: 0.3 });
+const pom = addMesh(new THREE.SphereGeometry(2.3, 64, 48), pomMat, 5.8, base + 2.15, 5.2, 1, 0.94, 1);
+const crown = addMesh(new THREE.CylinderGeometry(0.85, 0.55, 0.9, 7, 1, true), new THREE.MeshPhysicalMaterial({ color: '#6E0E19', roughness: 0.5, side: THREE.DoubleSide }), 5.8, base + 4.55, 5.2);
+for (let i = 0; i < 7; i++) {
+  const a = i / 7 * Math.PI * 2;
+  const t = addMesh(new THREE.ConeGeometry(0.18, 0.55, 4), crown.material, 5.8 + Math.cos(a) * 0.82, base + 5.1, 5.2 + Math.sin(a) * 0.82);
+  t.rotation.set(Math.sin(a) * 0.35, 0, -Math.cos(a) * 0.35);
+}
+
+const grapeMat = new THREE.MeshPhysicalMaterial({ color: '#2A0B2C', roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.15, sheen: 0.6, sheenColor: new THREE.Color('#8C7DA6'), sheenRoughness: 0.6 });
+const grapeGeo = new THREE.SphereGeometry(0.62, 32, 24);
+// a bunch lying on its side: berries packed in a tapering cone
+const berries = [];
+for (let L = 0; L < 3; L++) {
+  for (let i = 0; i < 6 - L; i++) {
+    const across = Math.max(1, 4 - Math.floor(i / 1.5) - L);
+    for (let k = 0; k < across; k++) {
+      const off = (k - (across - 1) / 2) * 1.2 + (L % 2) * 0.3;
+      berries.push(new THREE.Vector3(14.8 + (i + L * 0.5) * 1.05, 0.62 + L * 0.98, 4.4 + off + i * 0.35));
+    }
+  }
+}
+for (const p of berries) addMesh(grapeGeo, grapeMat, p.x, base + p.y, p.z, 1, 1.08, 1);
+addMesh(new THREE.CylinderGeometry(0.07, 0.1, 1.8, 8), stemMat, 14.2, base + 1.9, 4.2).rotation.z = 1.1;
+
+// soft pool of light on the backdrop
+const spot = new THREE.SpotLight('#fff1dc', 900, 0, 0.5, 0.9, 2);
+spot.position.set(0, 40, 30); spot.target.position.set(0, 18, -60); scene.add(spot, spot.target);
+
+// ---------------------------------------------------------------- lights
+const key = new THREE.DirectionalLight('#fff1de', 3.6);
+key.position.set(-30, 45, 30); key.castShadow = true;
+key.shadow.mapSize.set(4096, 4096); key.shadow.radius = 14; key.shadow.blurSamples = 25; key.shadow.bias = -0.0004;
+Object.assign(key.shadow.camera, { left: -40, right: 40, top: 40, bottom: -10, near: 1, far: 150 });
+scene.add(key);
+const fill = new THREE.DirectionalLight('#ffe9d2', 0.6); fill.position.set(35, 20, 25); scene.add(fill);
+const rimL = new THREE.DirectionalLight('#ffffff', 1.4); rimL.position.set(25, 30, -30); scene.add(rimL);
+scene.add(new THREE.HemisphereLight('#fff3e3', '#b89a74', 0.22));
+
+// ---------------------------------------------------------------- camera
+const cam = new THREE.PerspectiveCamera(24, W / H, 1, 500);
+cam.position.set(0, 20, 92);
+cam.lookAt(0, 15.5, 0);
+
+// post: contrast, vignette, fine grain (onto a 2D canvas)
+function finish() {
+  renderer.render(scene, cam);
+  const c = document.createElement('canvas'); c.id = 'final'; c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.filter = 'contrast(1.08) saturate(1.06)';
+  g.drawImage(renderer.domElement, 0, 0); g.filter = 'none';
+  const v = g.createRadialGradient(W / 2, H * 0.45, Math.min(W, H) * 0.35, W / 2, H * 0.45, Math.max(W, H) * 0.78);
+  v.addColorStop(0, 'rgba(60,35,15,0)'); v.addColorStop(1, 'rgba(60,35,15,0.38)');
+  g.fillStyle = v; g.fillRect(0, 0, W, H);
+  const img = g.getImageData(0, 0, W, H), d = img.data;
+  for (let i = 0; i < d.length; i += 4) { const n = (Math.random() - 0.5) * 7; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+  g.putImageData(img, 0, 0);
+  renderer.domElement.style.display = 'none';
+  document.body.appendChild(c);
+  window.READY = true;
+}
+renderer.render(scene, cam);
+// wait for textures, then render again and signal readiness
+let done = false;
+const go = () => { if (!done) { done = true; finish(); } };
+THREE.DefaultLoadingManager.onLoad = go;
+setTimeout(go, 8000);
+</script>
