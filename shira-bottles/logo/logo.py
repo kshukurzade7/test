@@ -1,19 +1,15 @@
 """SHIRÁ logo kit.
 
-Master logo: the eight-segment citrus slice in a warm "sun" palette (gold at the
-top deepening to red at the bottom, as if lit from above) with the SHIRÁ
-wordmark. The colour story of the range lives in the flavour marks: one mark per
-flavour in that flavour's label colour (no pomegranate).
-
-Everything is drawn as outlines (the wordmark is converted from Cormorant
-Garamond 500 with fontTools), so the SVG/PDF files need no fonts installed.
+The mark is a juicy orange slice: orange rind, pale pith, eight rounded pulp
+segments and a small green leaf. The wordmark is "shirá" in lowercase Nunito
+ExtraBold. Everything is drawn as outlines (the wordmark is converted from the
+font with fontTools), so the SVG/PDF files need no fonts installed.
 
 Run:  python3 logo.py && node export.mjs
       -> final/svg/*.svg (written here), final/png/*.png + final/pdf/*.pdf (export.mjs)
 """
 
 import math
-import sys
 from pathlib import Path
 
 from fontTools.pens.svgPathPen import SVGPathPen
@@ -21,50 +17,45 @@ from fontTools.pens.transformPen import TransformPen
 from fontTools.ttLib import TTFont
 
 HERE = Path(__file__).parent
-FONT = HERE.parent / "fonts" / "cormorant-garamond-latin-500-normal.woff2"
-sys.path.insert(0, str(HERE.parent / "label"))
-sys.path.insert(0, str(HERE.parent / "photo"))
-sys.path.insert(0, str(HERE.parent / "composite"))
-from collection import FLAVOURS  # noqa: E402
+FONT = HERE.parent / "fonts" / "nunito-latin-800-normal.woff2"
 
-INK = "#3A2A22"
-CREAM = "#F6EFE3"
-GOLD = "#B8934A"
-DARK_BG = "#2B201B"
-
-# Sun palette by distance from the top of the slice: top pair, upper sides, lower sides, bottom pair.
-SUN = ["#F2B33D", "#EF8E3A", "#E0612B", "#C9372C"]
-SUN_SEGMENTS = [SUN[0], SUN[1], SUN[2], SUN[3], SUN[3], SUN[2], SUN[1], SUN[0]]  # clockwise from 12 o'clock
-
-RANGE = [f for f in FLAVOURS if f["key"] != "pomegranate"]
+INK = "#2A1A12"
+LIGHT = "#FFF6EC"      # wordmark on dark backgrounds
+PITH = "#FFF3DC"
+LEAF, LEAF_VEIN = "#5DAE3B", "#3E8A2A"
+PULP = ("#FFB53F", "#FF5A1F")   # top -> bottom
+RIND = ("#FF9A2E", "#F0461A")
+BG_LIGHT, BG_DARK = "#FFFBF5", "#1D1714"
 
 _font = TTFont(FONT)
 _glyphs = _font.getGlyphSet()
 _cmap = _font.getBestCmap()
-UPM = _font["head"].unitsPerEm
+_scale_unit = 1 / _font["head"].unitsPerEm
+X_HEIGHT = _font["OS/2"].sxHeight * _scale_unit
 
 
-def text_outline(text, size, tracking):
-    """Wordmark as one SVG path (baseline at y=0, starting at x=0). Returns (d, width, cap_height)."""
-    scale = size / UPM
+def wordmark(size, tracking=-0.2):
+    """'shirá' as one SVG path, baseline at y=0, starting at x=0. Returns (d, width)."""
+    s = size * _scale_unit
     pen = SVGPathPen(_glyphs)
     x = 0.0
+    text = "shirá"
     for i, ch in enumerate(text):
-        name = _cmap[ord(ch)]
-        _glyphs[name].draw(TransformPen(pen, (scale, 0, 0, -scale, x, 0)))
-        x += _glyphs[name].width * scale + (tracking if i < len(text) - 1 else 0)
-    cap = _font["OS/2"].sCapHeight * scale
-    return pen.getCommands(), x, cap
+        g = _glyphs[_cmap[ord(ch)]]
+        g.draw(TransformPen(pen, (s, 0, 0, -s, x, 0)))
+        x += g.width * s + (tracking if i < len(text) - 1 else 0)
+    return pen.getCommands(), x
 
 
-def mark(r, colours, cx=0.0, cy=0.0):
-    """Citrus slice as eight separate segment shapes: real gaps between them and a hole in the
-    middle, so the mark works on any background."""
-    d, ri = r * 0.0375, r * 0.3  # half the cut width, centre hole radius
-    step = math.pi / 4
+def _segments(cx, cy, R):
+    """Eight pulp segments with rounded corners: (path d, stroke width) pairs drawn fill + round-join stroke."""
+    r, ri, rad = R * 0.82, R * 0.13, R * 0.07
+    d = R * 0.035 + rad
+    ro, rin = r - rad, ri + rad
     out = []
-    for k, colour in enumerate(colours):
-        a0, a1 = k * step, (k + 1) * step
+    for k in range(8):
+        a0 = k * math.pi / 4
+        a1 = a0 + math.pi / 4
 
         def pt(a, rho, side):
             u = (math.sin(a), -math.cos(a))
@@ -72,11 +63,42 @@ def mark(r, colours, cx=0.0, cy=0.0):
             t = math.sqrt(rho * rho - d * d)
             return cx + n[0] * d + u[0] * t, cy + n[1] * d + u[1] * t
 
-        p0o, p1o = pt(a0, r, 0), pt(a1, r, 1)
-        p1i, p0i = pt(a1, ri, 1), pt(a0, ri, 0)
-        out.append(f'<path fill="{colour}" d="M{p0o[0]:.3f} {p0o[1]:.3f} A{r} {r} 0 0 1 {p1o[0]:.3f} {p1o[1]:.3f} '
-                   f'L{p1i[0]:.3f} {p1i[1]:.3f} A{ri} {ri} 0 0 0 {p0i[0]:.3f} {p0i[1]:.3f}Z"/>')
-    return "".join(out)
+        p0o, p1o, p1i, p0i = pt(a0, ro, 0), pt(a1, ro, 1), pt(a1, rin, 1), pt(a0, rin, 0)
+        out.append(f"M{p0o[0]:.3f} {p0o[1]:.3f} A{ro:.3f} {ro:.3f} 0 0 1 {p1o[0]:.3f} {p1o[1]:.3f} "
+                   f"L{p1i[0]:.3f} {p1i[1]:.3f} A{rin:.3f} {rin:.3f} 0 0 0 {p0i[0]:.3f} {p0i[1]:.3f}Z")
+    return out, 2 * rad
+
+
+def _leaf(cx, cy, R, fill, vein):
+    L = R * 0.62
+    blade = (f"M0 0 C{L*0.3:.3f} {-L*0.38:.3f} {L*0.75:.3f} {-L*0.38:.3f} {L:.3f} 0 "
+             f"C{L*0.75:.3f} {L*0.38:.3f} {L*0.3:.3f} {L*0.38:.3f} 0 0Z")
+    vein_line = (f'<path d="M{L*0.12:.3f} 0 L{L*0.8:.3f} 0" stroke="{vein}" stroke-width="{R*0.035:.3f}" '
+                 f'stroke-linecap="round"/>' if vein else "")
+    return (f'<g transform="translate({cx + R*0.42:.3f} {cy - R*0.9:.3f}) rotate(-40)">'
+            f'<path fill="{fill}" d="{blade}"/>{vein_line}</g>')
+
+
+def mark(cx, cy, R, uid, mono=None):
+    """The orange slice. mono = one colour for single-colour use (the pith becomes transparent)."""
+    segs, sw = _segments(cx, cy, R)
+    if mono:
+        # Rind as a ring (even-odd), segments and leaf in one flat colour.
+        ring = (f'<path fill="{mono}" fill-rule="evenodd" d="M{cx - R:.3f} {cy:.3f} a{R} {R} 0 1 0 {2*R:.3f} 0 '
+                f'a{R} {R} 0 1 0 {-2*R:.3f} 0Z M{cx - R*0.89:.3f} {cy:.3f} a{R*0.89:.3f} {R*0.89:.3f} 0 1 0 '
+                f'{2*R*0.89:.3f} 0 a{R*0.89:.3f} {R*0.89:.3f} 0 1 0 {-2*R*0.89:.3f} 0Z"/>')
+        pulp = "".join(f'<path fill="{mono}" stroke="{mono}" stroke-width="{sw:.3f}" stroke-linejoin="round" d="{d}"/>'
+                       for d in segs)
+        return ring + pulp + _leaf(cx, cy, R, mono, None)
+    grad = (f'<defs><linearGradient id="pulp{uid}" gradientUnits="userSpaceOnUse" x1="0" y1="{cy-R:.3f}" x2="0" y2="{cy+R:.3f}">'
+            f'<stop offset="0" stop-color="{PULP[0]}"/><stop offset="1" stop-color="{PULP[1]}"/></linearGradient>'
+            f'<linearGradient id="rind{uid}" gradientUnits="userSpaceOnUse" x1="0" y1="{cy-R:.3f}" x2="0" y2="{cy+R:.3f}">'
+            f'<stop offset="0" stop-color="{RIND[0]}"/><stop offset="1" stop-color="{RIND[1]}"/></linearGradient></defs>')
+    pulp = "".join(f'<path fill="url(#pulp{uid})" stroke="url(#pulp{uid})" stroke-width="{sw:.3f}" '
+                   f'stroke-linejoin="round" d="{d}"/>' for d in segs)
+    return (grad + f'<circle cx="{cx:.3f}" cy="{cy:.3f}" r="{R}" fill="url(#rind{uid})"/>'
+            f'<circle cx="{cx:.3f}" cy="{cy:.3f}" r="{R*0.89:.3f}" fill="{PITH}"/>' + pulp
+            + _leaf(cx, cy, R, LEAF, LEAF_VEIN))
 
 
 def svg(w, h, body, bg=None):
@@ -85,82 +107,61 @@ def svg(w, h, body, bg=None):
             f'width="{w * 10:.0f}" height="{h * 10:.0f}">{rect}{body}</svg>\n')
 
 
-def stacked(colours, ink, rule=GOLD, bg=None):
-    r, size = 20, 30
-    d, tw, cap = text_outline("SHIRÁ", size, size * 0.14)
-    pad = 8
-    w = max(tw, 2 * r) + 2 * pad
-    cx = w / 2
-    mark_y = pad + r
-    base = mark_y + r + 12 + cap
-    rule_y = base + 7
-    h = rule_y + pad
-    body = (mark(r, colours, cx, mark_y)
-            + f'<path fill="{ink}" transform="translate({cx - tw / 2:.3f} {base:.3f})" d="{d}"/>'
-            + (f'<rect x="{cx - 14:.2f}" y="{rule_y - 0.4:.2f}" width="28" height="0.8" fill="{rule}"/>' if rule else ""))
-    return svg(w, h, body, bg)
+# Geometry shared by the lockups. The leaf reaches about 0.25 R above the rind.
+R = 12.5
+LEAF_TOP = R * 1.25
+PAD = 4
 
 
-def horizontal(colours, ink, bg=None):
-    r, size = 13, 30
-    d, tw, cap = text_outline("SHIRÁ", size, size * 0.14)
-    pad = 6
-    gap = 9
-    h = 2 * r + 2 * pad
-    cy = h / 2
-    base = cy + cap / 2
-    w = pad + 2 * r + gap + tw + pad
-    body = (mark(r, colours, pad + r, cy)
-            + f'<path fill="{ink}" transform="translate({pad + 2 * r + gap:.3f} {base:.3f})" d="{d}"/>')
-    return svg(w, h, body, bg)
+def horizontal(ink, mono=None, uid="h"):
+    """Main logo: slice on the left, wordmark on the right, centred on the x-height."""
+    d, tw = wordmark(26)
+    cy = PAD + LEAF_TOP
+    base = cy + X_HEIGHT * 26 / 2
+    gap = 7
+    w = PAD + 2 * R + gap + tw + PAD
+    h = cy + R + PAD
+    body = mark(PAD + R, cy, R, uid, mono) + f'<path fill="{ink}" transform="translate({PAD + 2*R + gap:.3f} {base:.3f})" d="{d}"/>'
+    return svg(w, h, body)
 
 
-def mark_only(colours, bg=None, pad=4):
-    r = 20
-    w = 2 * (r + pad)
-    return svg(w, w, mark(r, colours, w / 2, w / 2), bg)
+def stacked(ink, mono=None, uid="s"):
+    """Slice above the wordmark, for square spaces."""
+    size = 26
+    d, tw = wordmark(size)
+    w = max(tw, 2 * R) + 2 * PAD
+    cy = PAD + LEAF_TOP
+    base = cy + R + 6 + X_HEIGHT * size + size * 0.25  # room for the accent on á
+    h = base + size * 0.25 + PAD  # descender-free word, small bottom margin
+    body = mark(w / 2, cy, R, uid, mono) + f'<path fill="{ink}" transform="translate({w/2 - tw/2:.3f} {base:.3f})" d="{d}"/>'
+    return svg(w, h, body)
 
 
-def collection_sheet():
-    """Flavour marks: one per flavour in its label colour, with the name underneath."""
-    cols, cell_w, cell_h, r = 4, 46, 52, 13
-    rows = math.ceil(len(RANGE) / cols)
-    hd, hw, hcap = text_outline("SHIRÁ", 16, 16 * 0.14)
-    top = 34
-    w, h = cols * cell_w + 16, top + rows * cell_h + 8
-    left = (w - (22 + 6 + hw)) / 2  # header: mark (r=11) + gap + wordmark, centred as one group
-    body = [mark(11, SUN_SEGMENTS, left + 11, 17),
-            f'<path fill="{INK}" transform="translate({left + 28:.2f} {17 + hcap / 2:.2f})" d="{hd}"/>']
-    for i, f in enumerate(RANGE):
-        in_row = min(cols, len(RANGE) - (i // cols) * cols)  # centre a short last row
-        cx = w / 2 + ((i % cols) - (in_row - 1) / 2) * cell_w
-        cy = top + (i // cols) * cell_h + r + 4
-        nd, nw, _ = text_outline(f["name"], 7, 0.2)
-        body.append(mark(r, [f["accent"]] * 8, cx, cy))
-        body.append(f'<path fill="{f["accent"]}" transform="translate({cx - nw / 2:.2f} {cy + r + 11:.2f})" d="{nd}"/>')
-    return svg(w, h, "".join(body), CREAM)
+def mark_only(mono=None, bg=None, pad=PAD, uid="m"):
+    w = 2 * (R + pad)
+    cy = (w - (LEAF_TOP + R)) / 2 + LEAF_TOP  # centre slice + leaf as one shape
+    return svg(w, w, mark(w / 2, cy, R, uid, mono), bg)
 
 
-# name -> svg. Colour versions for light backgrounds, "on-dark" versions for dark ones,
-# one-colour versions for stamps, embossing and single-colour print.
 VERSIONS = {
-    "shira-logo": stacked(SUN_SEGMENTS, INK),
-    "shira-logo-on-dark": stacked(SUN_SEGMENTS, CREAM),
-    "shira-logo-black": stacked([INK] * 8, INK, rule=INK),
-    "shira-logo-white": stacked([CREAM] * 8, CREAM, rule=CREAM),
-    "shira-logo-horizontal": horizontal(SUN_SEGMENTS, INK),
-    "shira-logo-horizontal-on-dark": horizontal(SUN_SEGMENTS, CREAM),
-    "shira-mark": mark_only(SUN_SEGMENTS),
-    "shira-mark-black": mark_only([INK] * 8),
-    "shira-mark-white": mark_only([CREAM] * 8),
-    "shira-avatar": mark_only(SUN_SEGMENTS, bg=CREAM, pad=12),
-    "shira-flavour-marks": collection_sheet(),
+    "shira-logo": horizontal(INK),
+    "shira-logo-on-dark": horizontal(LIGHT, uid="hd"),
+    "shira-logo-stacked": stacked(INK),
+    "shira-logo-stacked-on-dark": stacked(LIGHT, uid="sd"),
+    "shira-logo-black": horizontal(INK, mono=INK),
+    "shira-logo-white": horizontal("#FFFFFF", mono="#FFFFFF"),
+    "shira-mark": mark_only(),
+    "shira-mark-black": mark_only(mono=INK),
+    "shira-mark-white": mark_only(mono="#FFFFFF"),
+    "shira-avatar": mark_only(bg=BG_LIGHT, pad=10, uid="a"),
 }
 
 
 def main():
     out = HERE / "final" / "svg"
     out.mkdir(parents=True, exist_ok=True)
+    for old in out.glob("*.svg"):
+        old.unlink()
     for name, data in VERSIONS.items():
         (out / f"{name}.svg").write_text(data, encoding="utf-8")
 

@@ -1,10 +1,12 @@
 // Export final/svg/*.svg to transparent PNGs and vector PDFs with the pre-installed Chromium.
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
-import { mkdirSync, readFileSync, readdirSync } from 'fs';
+import { mkdirSync, readFileSync, readdirSync, rmSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 const dir = join(dirname(fileURLToPath(import.meta.url)), 'final');
+rmSync(join(dir, 'png'), { recursive: true, force: true });
+rmSync(join(dir, 'pdf'), { recursive: true, force: true });
 mkdirSync(join(dir, 'png'), { recursive: true });
 mkdirSync(join(dir, 'pdf'), { recursive: true });
 const browser = await chromium.launch();
