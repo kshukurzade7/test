@@ -7,6 +7,8 @@ small Azerbaijan flag beside PRODUCT OF AZERBAIJAN.
 Run:  python3 collection.py
       -> collection/shira-<flavour>-label.svg (print, with dieline)
          collection/shira-<flavour>-label-texture.svg (no dieline)
+      python3 collection.py --citrus     -> collection-citrus/    (approved design, English)
+      python3 collection.py --citrus-ru  -> collection-citrus-ru/ (approved design, all text in Russian)
 """
 
 import random
@@ -31,6 +33,37 @@ OUT = HERE / "collection"
 # "original" reproduces the first proof's design exactly (original mark, no flag);
 # "current" uses the redrawn citrus-slice mark and the small flag.
 STYLE = "current"
+LANG = "en"
+
+# Fixed label copy per language. English strings are the approved originals.
+TEXT = {
+    "en": dict(brand="SHIRÁ", tagline="100% NATURAL JUICE · NOT FROM CONCENTRATE", origin="PRODUCT OF AZERBAIJAN",
+               volume="500 ml", ingredients="INGREDIENTS", storage="STORAGE", nutrition="NUTRITION", per="per 100 ml",
+               no_added="No added sugar, water, colours or preservatives. Pasteurised.",
+               storage_text="Shake well. Store cool and dry, away from sunlight. Once opened, refrigerate and drink within 3 days.",
+               recycle="Glass bottle. Please recycle.", lot="Best before / Lot: see cap.",
+               producer=["Producer: [ name, address ],", "Azerbaijan · [ website ]"],
+               rows=["Energy", "Fat", "-saturates", "Carbohydrate", "-sugars", "Protein", "Salt"], of_which="of which ",
+               tbc="TBC", barcode="EAN-13 barcode", barcode_area="31 x 21 mm area"),
+    "ru": dict(brand="ШИРА\u0301", tagline="100% НАТУРАЛЬНЫЙ СОК · ПРЯМОГО ОТЖИМА", origin="СДЕЛАНО В АЗЕРБАЙДЖАНЕ",
+               volume="500 мл", ingredients="СОСТАВ", storage="ХРАНЕНИЕ", nutrition="ПИЩ. ЦЕННОСТЬ", per="на 100 мл",
+               no_added="Без добавления сахара, воды, красителей и консервантов. Пастеризован.",
+               storage_text="Перед употреблением взболтать. Хранить в сухом прохладном месте, защищённом от солнца. "
+                            "После вскрытия хранить в холодильнике не более 3 суток.",
+               recycle="Стекло. Сдайте в переработку.", lot="Годен до / Партия: см. на крышке.",
+               producer=["Изготовитель: [ название, адрес ],", "Азербайджан · [ сайт ]"],
+               rows=["Энерг. ценность", "Жиры", "-насыщенные", "Углеводы", "-сахара", "Белки", "Соль"],
+               of_which="в т. ч. ", tbc="уточн.", barcode="Штрихкод EAN-13", barcode_area="зона 31 × 21 мм"),
+}
+
+
+def tx(key):
+    return TEXT[LANG][key]
+
+
+def loc(f, field):
+    """Flavour copy in the current language (Russian fields are stored as ru_<field>)."""
+    return f[f"ru_{field}"] if LANG == "ru" else f[field]
 
 
 def original_emblem(c, r):
@@ -49,9 +82,9 @@ def mark(c, r):
 
 def origin_line():
     if STYLE in ("original", "citrus"):
-        return f'<text x="9" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>'
+        return f'<text x="9" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">{tx("origin")}</text>'
     return (f'<g transform="translate(9 84.9)">{az_flag(7)}</g>'
-            f'<text x="18.4" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">PRODUCT OF AZERBAIJAN</text>')
+            f'<text x="18.4" y="88.2" font-family="{SANS}" font-size="2.0" letter-spacing="0.55" fill="{CREAM}">{tx("origin")}</text>')
 
 # band = colour block, accent = flavour name + mark, juice = liquid colour for mockups
 FLAVOURS = [
@@ -80,27 +113,59 @@ FLAVOURS = [
     dict(key="apple", name="Apple", band="#5F9A3A", accent="#4E842E", juice="#E2B24A",
          story="Crisp apples from Azerbaijan's orchards, pressed and bottled for a pure, clear juice. Nothing added."),
 ]
+# Russian copy for the --citrus-ru labels.
+RU = {
+    "blackcurrant": dict(name="Чёрная смородина", title="Сок чёрной смородины",
+                story="Тёмная ароматная чёрная смородина с холмов Азербайджана — насыщенный, яркий сок. Ничего лишнего."),
+    "redcurrant": dict(name="Красная смородина", title="Сок красной смородины",
+                story="Яркая красная смородина, собранная вручную в Азербайджане, — свежий, бодрящий сок. Ничего лишнего."),
+    "peach": dict(name="Персик", title="Персиковый сок",
+                story="Нежные персики, созревшие на солнце в садах Азербайджана, — мягкий золотистый сок. Ничего лишнего."),
+    "cranberry": dict(name="Клюква", title="Клюквенный сок",
+                story="Терпкая клюква бережного отжима — чистый, освежающий сок. Ничего не добавлено, ничего не убрано."),
+    "pear": dict(name="Груша", title="Грушевый сок",
+                story="Сочные груши позднего лета из Азербайджана — мягкий, деликатный сок. Ничего лишнего."),
+    "quince": dict(name="Айва", title="Айвовый сок",
+                story="Душистая золотистая айва, любимый осенний плод Азербайджана, — ароматный сок. Ничего лишнего."),
+    "pumpkin": dict(name="Тыква", title="Тыквенный сок",
+                story="Сладкая осенняя тыква с полей Азербайджана — бархатистый, согревающий сок. Ничего лишнего."),
+    "feijoa": dict(name="Фейхоа", title="Сок фейхоа",
+                story="Ароматная фейхоа с субтропического юга Азербайджана — свежий, экзотический сок. Ничего лишнего."),
+    "rosehip": dict(name="Шиповник", title="Сок шиповника",
+                story="Дикий шиповник, природный источник витамина C, — яркий сок с приятной кислинкой. Ничего лишнего."),
+    "hawthorn": dict(name="Боярышник", title="Сок боярышника",
+                story="Дикий боярышник с гор Азербайджана — мягкий фруктовый сок. Ничего лишнего."),
+    "pomegranate": dict(name="Гранат", title="Гранатовый сок",
+                story="Рубиновые гранаты из Азербайджана бережного отжима — насыщенный сок с кислинкой. Ничего не добавлено, ничего не убрано."),
+    "apple": dict(name="Яблоко", title="Яблочный сок",
+                story="Хрустящие яблоки из садов Азербайджана — чистый, прозрачный сок. Ничего лишнего."),
+}
 for f in FLAVOURS:
+    f["title"] = f"{f['name']} juice"
     f["ingredients"] = f"{f['name']} juice (100%)."
+    for k, v in RU[f["key"]].items():
+        f[f"ru_{k}"] = v
+    f["ru_ingredients"] = f"{f['ru_title']} (100%)."
 
 
 def front(f):
     cx = FRONT_W / 2
     band_h = TRIM_H - SPLIT
     art = ART[f["key"]](FRONT_W * 0.66, SPLIT + band_h * 0.5, band_h * 0.6, random.Random(f["key"]))
-    name_size = 9 if len(f["name"]) <= 9 else 8
+    name = loc(f, "name")
+    name_size = 9 if len(name) <= 9 else 8 if len(name) <= 12 else 7
     return f"""
 <rect x="{-BLEED}" y="{-BLEED}" width="{FRONT_W + BLEED}" height="{SPLIT + BLEED}" fill="{CREAM}"/>
 <rect x="{-BLEED}" y="{SPLIT}" width="{FRONT_W + BLEED}" height="{band_h + BLEED}" fill="{f['band']}"/>
 <clipPath id="band-{f['key']}"><rect x="{-BLEED}" y="{SPLIT}" width="{FRONT_W + BLEED}" height="{band_h + BLEED}"/></clipPath>
 <g clip-path="url(#band-{f['key']})">{art}</g>
 <g transform="translate({cx} 12.5)">{mark(f['accent'], 5.2)}</g>
-<text x="{cx}" y="30" text-anchor="middle" font-family="{SERIF}" font-weight="500" font-size="13.5" letter-spacing="2.9" fill="{INK}">SHIRÁ</text>
+<text x="{cx}" y="30" text-anchor="middle" font-family="{SERIF}" font-weight="500" font-size="13.5" letter-spacing="2.9" fill="{INK}">{tx("brand")}</text>
 <line x1="{cx - 7}" y1="34" x2="{cx + 7}" y2="34" stroke="{GOLD}" stroke-width="0.35"/>
-<text x="{cx}" y="43" text-anchor="middle" font-family="{SERIF}" font-style="italic" font-size="{name_size}" fill="{f['accent']}">{f['name']}</text>
-<text x="{cx}" y="49.3" text-anchor="middle" font-family="{SANS}" font-size="2.0" letter-spacing="0.5" fill="#6B5A4E">100% NATURAL JUICE · NOT FROM CONCENTRATE</text>
+<text x="{cx}" y="43" text-anchor="middle" font-family="{SERIF}" font-style="italic" font-size="{name_size}" fill="{f['accent']}">{name}</text>
+<text x="{cx}" y="49.3" text-anchor="middle" font-family="{SANS}" font-size="2.0" letter-spacing="0.5" fill="#6B5A4E">{tx("tagline")}</text>
 {origin_line()}
-<text x="{FRONT_W - 8}" y="88.6" text-anchor="end" font-family="{SANS}" font-weight="500" font-size="6" fill="{CREAM}">500 ml</text>"""
+<text x="{FRONT_W - 8}" y="88.6" text-anchor="end" font-family="{SANS}" font-weight="500" font-size="6" fill="{CREAM}">{tx("volume")}</text>"""
 
 
 def back(f):
@@ -119,46 +184,46 @@ def back(f):
         f'<rect x="{FRONT_W}" y="{-BLEED}" width="{TRIM_W - FRONT_W + BLEED}" height="{BLEED + 2.2}" fill="{f["band"]}"/>',
         f'<rect x="{FRONT_W}" y="{TRIM_H - 2.2}" width="{TRIM_W - FRONT_W + BLEED}" height="{BLEED + 2.2}" fill="{f["band"]}"/>',
         f'<g transform="translate({x0 + 3} 12)">{mark(f["accent"], 2.7)}</g>',
-        f'<text x="{x0 + 8}" y="13.9" font-family="{SERIF}" font-size="5.8" letter-spacing="1.3" fill="{INK}">SHIRÁ</text>',
-        f'<text x="{x0 + 8}" y="19.6" font-family="{SERIF}" font-style="italic" font-size="4.2" fill="{f["accent"]}">{f["name"]} juice</text>',
+        f'<text x="{x0 + 8}" y="13.9" font-family="{SERIF}" font-size="5.8" letter-spacing="1.3" fill="{INK}">{tx("brand")}</text>',
+        f'<text x="{x0 + 8}" y="19.6" font-family="{SERIF}" font-style="italic" font-size="4.2" fill="{f["accent"]}">{loc(f, "title")}</text>',
     ]
-    story = wrap(f["story"], 66)
+    story = wrap(loc(f, "story"), 66)
     out.append(text_lines(story, x0, 26.5, 2.9, 3.6, font_family=SERIF, font_style="italic", fill=BODY))
     top = 26.5 + len(story) * 3.6 + 3.2
     out.append(f'<line x1="{x0}" y1="{top - 2.6:.2f}" x2="{TRIM_W - 7}" y2="{top - 2.6:.2f}" stroke="#D8C9B6" stroke-width="0.2"/>')
 
     y = top + 1
-    out.append(head(x0, y, "INGREDIENTS"))
-    ing = wrap(f["ingredients"] + " No added sugar, water, colours or preservatives. Pasteurised.", 28)
+    out.append(head(x0, y, tx("ingredients")))
+    ing = wrap(loc(f, "ingredients") + " " + tx("no_added"), 28)
     out.append(body(ing, x0, y + 3.2))
     y += 3.2 + len(ing) * 3.05 + 1.6
-    out.append(head(x0, y, "STORAGE"))
-    st = wrap("Shake well. Store cool and dry, away from sunlight. Once opened, refrigerate and drink within 3 days.", 28)
+    out.append(head(x0, y, tx("storage")))
+    st = wrap(tx("storage_text"), 28)
     out.append(body(st, x0, y + 3.2))
     y += 3.2 + len(st) * 3.05 + 1.6
     out.append(f'<g transform="translate({x0 + 0.2} {y - 3.4:.2f}) scale(0.4)" fill="none" stroke="{BODY}" stroke-width="0.4">'
                '<path d="M 2.5 0 L 4.7 0 L 4.7 1.8 Q 6 2.8 6 5 L 6 10.5 Q 6 11.2 5.3 11.2 L 1.9 11.2 '
                'Q 1.2 11.2 1.2 10.5 L 1.2 5 Q 1.2 2.8 2.5 1.8 Z"/></g>')
-    out.append(body(["Glass bottle. Please recycle."], x0 + 4.2, y))
+    out.append(body([tx("recycle")], x0 + 4.2, y))
     y += 4.2
-    out.append(body(["Best before / Lot: see cap."], x0, y))
-    out.append(body(["Producer: [ name, address ],", "Azerbaijan · [ website ]"], x0, y + 3.6))
+    out.append(body([tx("lot")], x0, y))
+    out.append(body(tx("producer"), x0, y + 3.6))
 
     y = top + 1
-    out.append(head(bx, y, "NUTRITION"))
-    out.append(f'<text x="{bx + 35}" y="{y:.2f}" font-size="1.8" text-anchor="end" {sans}>per 100 ml</text>')
+    out.append(head(bx, y, tx("nutrition")))
+    out.append(f'<text x="{bx + 35}" y="{y:.2f}" font-size="1.8" text-anchor="end" {sans}>{tx("per")}</text>')
     out.append(f'<line x1="{bx}" y1="{y + 1:.2f}" x2="{bx + 35}" y2="{y + 1:.2f}" stroke="{BODY}" stroke-width="0.3"/>')
-    for i, r in enumerate(["Energy", "Fat", "-saturates", "Carbohydrate", "-sugars", "Protein", "Salt"]):
+    for i, r in enumerate(tx("rows")):
         yy = y + 3.9 + i * 2.85
         sub = r.startswith("-")
-        name = ("of which " + r[1:]) if sub else r
+        name = (tx("of_which") + r[1:]) if sub else r
         out.append(f'<text x="{bx + (1.8 if sub else 0)}" y="{yy:.2f}" font-size="2.35" {sans}>{name}</text>'
-                   f'<text x="{bx + 35}" y="{yy:.2f}" font-size="2.35" text-anchor="end" {sans}>TBC</text>'
+                   f'<text x="{bx + 35}" y="{yy:.2f}" font-size="2.35" text-anchor="end" {sans}>{tx("tbc")}</text>'
                    f'<line x1="{bx}" y1="{yy + 0.75:.2f}" x2="{bx + 35}" y2="{yy + 0.75:.2f}" stroke="#C9B9A6" stroke-width="0.15"/>')
     by = y + 3.9 + 6 * 2.85 + 2.6
     out.append(f'<rect x="{bx + 2}" y="{by:.2f}" width="31" height="21" fill="#fff" stroke="#9C8B7C" stroke-width="0.2"/>'
-               f'<text x="{bx + 17.5}" y="{by + 9.5:.2f}" text-anchor="middle" font-size="2.1" {sans}>EAN-13 barcode</text>'
-               f'<text x="{bx + 17.5}" y="{by + 12.6:.2f}" text-anchor="middle" font-size="1.7" fill="#9C8B7C" font-family="{SANS}">31 x 21 mm area</text>')
+               f'<text x="{bx + 17.5}" y="{by + 9.5:.2f}" text-anchor="middle" font-size="2.1" {sans}>{tx("barcode")}</text>'
+               f'<text x="{bx + 17.5}" y="{by + 12.6:.2f}" text-anchor="middle" font-size="1.7" fill="#9C8B7C" font-family="{SANS}">{tx("barcode_area")}</text>')
     return "".join(out)
 
 
@@ -171,11 +236,13 @@ def svg(f, with_dieline):
 
 
 def main():
-    global STYLE, OUT
+    global STYLE, OUT, LANG
     if "--original" in sys.argv:
         STYLE, OUT = "original", HERE / "collection-original"
     if "--citrus" in sys.argv:
         STYLE, OUT = "citrus", HERE / "collection-citrus"
+    if "--citrus-ru" in sys.argv:
+        STYLE, OUT, LANG = "citrus", HERE / "collection-citrus-ru", "ru"
     OUT.mkdir(exist_ok=True)
     for f in FLAVOURS:
         (OUT / f"shira-{f['key']}-label.svg").write_text(svg(f, True), encoding="utf-8")
