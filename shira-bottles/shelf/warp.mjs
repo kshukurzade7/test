@@ -6,7 +6,7 @@ import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 import { readFileSync } from 'fs';
 
 const S = 3; // output scale vs the source photo
-const params = JSON.parse(readFileSync('params.json', 'utf8'));
+const params = JSON.parse(readFileSync(process.env.PARAMS || 'params.json', 'utf8'));
 const b64 = (p) => readFileSync(p).toString('base64');
 const browser = await chromium.launch();
 const page = await browser.newPage();
@@ -74,5 +74,5 @@ const out = await page.evaluate(async ({ base, flats, params, S }) => {
   return btoa(s);
 }, { base: b64('base.png'), flats, params, S });
 
-(await import('fs')).writeFileSync('shira-shelf.png', Buffer.from(out, 'base64'));
+(await import('fs')).writeFileSync(process.env.OUT || 'shira-shelf.png', Buffer.from(out, 'base64'));
 await browser.close();
