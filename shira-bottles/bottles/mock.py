@@ -7,11 +7,14 @@ column brightness so the glass highlights stay over the paper.
 Run:  node render-wraps.mjs <keys...> && python3 mock.py
 """
 import math
+import os
 import numpy as np
 from PIL import Image, ImageFilter
 
 CX, R, Y0, LH = 541.5, 161.5, 745, 463      # bottle axis, radius, label top/height (px)
 MM_R, PX_MM, BLEED, FRONT_C = 33.0, 12, 3, 47.5
+DESIGN = os.environ.get("DESIGN", "arch")
+SUF = "" if DESIGN == "arch" else f"-{DESIGN}"
 JOBS = [(1, "quince"), (2, "redcurrant"), (3, "blackcurrant"), (4, "rosehip"), (5, "apple")]
 
 
@@ -55,13 +58,13 @@ def wrap_on(photo, wrap):
 def main():
     outs = []
     for i, k in JOBS:
-        res = wrap_on(Image.open(f"photo-{i}.webp"), Image.open(f"wraps/{k}.png"))
-        res.save(f"shira-bottle-{k}.png")
+        res = wrap_on(Image.open(f"photo-{i}.webp"), Image.open(f"wraps{SUF}/{k}.png"))
+        res.save(f"shira-bottle-{k}{SUF}.png")
         outs.append(res)
     sheet = Image.new("RGB", (len(outs) * 543, 724), "white")
     for n, im in enumerate(outs):
         sheet.paste(im.resize((543, 724), Image.LANCZOS), (n * 543, 0))
-    sheet.save("shira-bottles-lineup.png")
+    sheet.save(f"shira-bottles-lineup{SUF}.png")
 
 
 if __name__ == "__main__":
